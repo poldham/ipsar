@@ -595,7 +595,7 @@
 <p>An effort has been made to preserve the records for MPs who leave the House of Commons and those who move to the House of Lords to assist with historical research. This information is recorded in the supplementary column <code>current_role</code> as either MP, Lords or Ex. For everyday use you will normally want to drop the Ex and Lords entries. To filter only to current MPs in the <code>ipsa_commons</code> concordance table use:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">library</span>(tidyverse)</a>
 <a class="sourceLine" id="cb7-2" data-line-number="2">ipsa_commons <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(current_role <span class="op">==</span><span class="st"> "MP"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/dplyr/topics/filter">filter</a></span>(current_role <span class="op">==</span><span class="st"> "MP"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb7-4" data-line-number="4"><span class="st">  </span><span class="kw">head</span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb7-5" data-line-number="5"><span class="st">  </span>knitr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/knitr/topics/kable">kable</a></span>()</a></code></pre></div>
 <table class="table">
@@ -842,7 +842,7 @@
 </table>
 <p>Or for expenses claims use:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">ipsa <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(current_role <span class="op">==</span><span class="st"> "MP"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/dplyr/topics/filter">filter</a></span>(current_role <span class="op">==</span><span class="st"> "MP"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb8-3" data-line-number="3"><span class="st">  </span><span class="kw">head</span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb8-4" data-line-number="4"><span class="st">  </span>knitr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/knitr/topics/kable">kable</a></span>()</a></code></pre></div>
 <table class="table">
@@ -1061,7 +1061,7 @@
 <ul>
 <li>column names converted to lower case and spaces and punctuation removed with <code><a href="http://www.rdocumentation.org/packages/janitor/topics/clean_names">janitor::clean_names()</a></code>
 </li>
-<li>date column converted from dd/mm/yyyy to yyyy-mm-dd with <code><a href="http://lubridate.tidyverse.org/reference/ymd.html">lubridate::ymd()</a></code>.</li>
+<li>date column converted from dd/mm/yyyy to yyyy-mm-dd with <code><a href="http://www.rdocumentation.org/packages/lubridate/topics/ymd">lubridate::ymd()</a></code>.</li>
 <li>columns 14:19 converted to numeric (“nights”, “mileage”, “amount_claimed”, “amount_paid”, “amount_not_paid”, “amount_repaid”)</li>
 <li>Some names appear in more than one form or have changed over time in the ipsa records. These records are left as is with details provided in the vignette.</li>
 </ul>
@@ -1390,7 +1390,7 @@
 <div class="developers">
 <h2>Developers</h2>
 <ul class="list-unstyled">
-<li>Paul Oldham <br><small class="roles"> Author, maintainer </small>  </li>
+<li>Paul Oldham <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-1013-4390" target="orcid.widget"><img src="https://members.orcid.org/sites/default/files/vector_iD_icon.svg" class="orcid" height="16"></a> </li>
 </ul>
 </div>
 
