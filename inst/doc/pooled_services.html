@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Paul Oldham" />
+
+<meta name="date" content="2018-04-27" />
+
+<title>Exploring Pooled Services</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Exploring Pooled Services</h1>
+<h4 class="author"><em>Paul Oldham</em></h4>
+<h4 class="date"><em>2018-04-27</em></h4>
+
+
+
+<p>MPs can pool expenses to pay for shared resources under a system called <code>pooled services</code>. Pooled services are typically for research services such as the payment of researchers salaries and associated costs. At the time of writing there were five such services.</p>
+<ul>
+<li>The Parliamentary Support Team (PST) provides pooled services to Liberal Democrat MPs</li>
+<li>The Parliamentary Research Service (PRS) provides pooled services to Labour Party MPs</li>
+<li>The Policy Research Unit (PRU) provides pooled services to Conservative Party MPs.</li>
+<li>The European Research Group (ERG) provides research and briefing materials to Conservative MPs on issues relating to the UK’s relationship with the European Union.</li>
+<li>The Scottish National Party (SNP) Research Team provides pooled services to SNP MPs.</li>
+</ul>
+<p>IPSA has produced an an assessment of pooled services <a href="https://www.theipsa.org.uk/media/184678/pooled-services-assurance-report_final.pdf">Assurance Review: Pooled Services, Assessment of risks, controls and compliance, 2015-2016</a> that was last updated in 2017.</p>
+<p>MPs pay for these services through subscription fees that are then reclaimed as expenses. At present the package does not compile this data. Initial exploration of the data reveals that the descriptions of these services varies and affects our ability to accurately capture expenses claims. We can however get an initial idea of what might be involved by simply searching for research in the data and seeking to capture variants:</p>
+<pre><code>#&gt; 
+#&gt; Attaching package: 'ipsar'
+#&gt; The following object is masked _by_ '.GlobalEnv':
+#&gt; 
+#&gt;     ipsa_commons</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)
+ipsa<span class="op">$</span>research &lt;-<span class="st"> </span><span class="kw">str_detect</span>(ipsa<span class="op">$</span>short_description, <span class="st">&quot; Research*&quot;</span>)
+ipsa <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(research <span class="op">==</span><span class="st"> &quot;TRUE&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">select</span>(expense_type, short_description, details)
+<span class="co">#&gt; # A tibble: 450 x 3</span>
+<span class="co">#&gt;    expense_type                   short_description              details  </span>
+<span class="co">#&gt;    &lt;chr&gt;                          &lt;chr&gt;                          &lt;chr&gt;    </span>
+<span class="co">#&gt;  1 Professional Services (Staff.) Payment for Research Work      Research…</span>
+<span class="co">#&gt;  2 Pooled Staffing Services       Pooled Research Services       PRU invo…</span>
+<span class="co">#&gt;  3 Public Tr RAIL MP Staff - SGL  Const Researcher travel  train HP train…</span>
+<span class="co">#&gt;  4 Professional Services (Staff.) Payment for Research Work      Research…</span>
+<span class="co">#&gt;  5 Professional Services (Staff.) Senior Researcher July         [***]  J…</span>
+<span class="co">#&gt;  6 Pooled Staffing Services       European Research Group        European…</span>
+<span class="co">#&gt;  7 Pooled Staffing Services       European Research Group        ERG Pool…</span>
+<span class="co">#&gt;  8 Pooled Staffing Services       European Research Group        Part pay…</span>
+<span class="co">#&gt;  9 Professional Services (Staff.) Payment for Research Work      Invoice …</span>
+<span class="co">#&gt; 10 Recruitment Services           Advert Researcher / Case       Job Adve…</span>
+<span class="co">#&gt; # ... with 440 more rows</span></code></pre></div>
+<p>As this makes clear, this data is rather messy and would require care in cleaning up. As we will see in the example below, the details of expenses may be spread across multiple columns.</p>
+<p>The European Research Group (ERG) is a topical example of one such pooled service that illustrates the work involved in arriving at a clean and tidy dataset.</p>
+<p>MPs subscriptions to the ERG are recorded in the <code>short_description</code> column and in the <code>details</code> column. This is likely to be the case for other pooled services.</p>
+<p>Rather than focus on the most efficient route to name cleaning (e.g. using regular expressions) a simpler approach involving identification and standardization of variants is used with the <code>stringr</code> package which forms part of the <code>tidyverse</code>. The benefit of this approach is that it is more transparent and easier to track variants and make corrections over time. We put the cleaned up data in a new column called <code>clean_description</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)
+ipsa<span class="op">$</span>clean_description &lt;-<span class="st"> </span>ipsa<span class="op">$</span>short_description <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;European Research Group&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;EUROPEAN RESEARCH GROUP&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;European Research Group staff&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;110516 - ERG Membership&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG Fees&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG Payment&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG Researcher&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG Sub 2011-12&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG subscription&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace</span>(<span class="st">&quot;ERG 2010/2011&quot;</span>, <span class="st">&quot;ERG&quot;</span>)</code></pre></div>
+<p>In some cases the reference to the pooled service is not contained in the <code>short_description</code> field but in the <code>details</code> field. We therefore need to run the same exercise with the details field based on manual inspection of summaries of this field. To manually inspect the data we can use the following and hunt through for entries relevant to the pooled service we are looking for. THere is a lot to review and hence we use <code>View()</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ipsa <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">count</span>(details) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">View</span>()</code></pre></div>
+<p>It turns out that references to the subscriptions in the details field contain characters such as <code>[***]</code> and <code>()</code> that cause problems if we try to replace them in a straighforward way. We therefore use a couple of regular expressions at the beginning of the tidy up and edit the named entries to exclude those for matching. This will only be as good as our ability to spot the variants in the data.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ipsa<span class="op">$</span>clean_details &lt;-<span class="st"> </span>ipsa<span class="op">$</span>details <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">[([^]]*)]&quot;</span>, <span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># remove hard brackets and ***</span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;[(]|[)]&quot;</span>, <span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># remove brackets</span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;European Research Group&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;EUROPEAN RESEARCH GROUP&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;2010 EUROPEAN RESERCH GROUP&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;Annual subs European Research Group&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;European Research Group for 2010/11&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;European Research Group Membership&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;European Research Group pooled staff&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;European Research Group Researcher&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;European Research Group Subscription&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;Membership for the European Research Group&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;Research Services - European Research Group &quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;Membership for European Research Group for Committee Purposes&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;Research Services - European Research Group &quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;Research services on European issues, in support of Parliamentary functions&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG Pooled staffing&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG services from pooled staff member as previous year&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG subscription&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG Subscription&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG subscription &quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG subscription-&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG subscriptionIP&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG for 2010/11&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG Researcher&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;Membership for ERG for Committee purposes&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG Membership&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERGservices from pooled staff member as previous year&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;Annual subs ERG&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;Annual Sub 2013-14&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG Membership&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;PART STAFFING COSTS FOR ERGBACS payment received&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;PART STAFFING COSTS FOR ERG &quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERGIP&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG &quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG-&quot;</span>, <span class="st">&quot;ERG&quot;</span>) </code></pre></div>
+<p>We can now take a look at summarising the subscribers. We add an id by row to assist with identifying duplicates and break the data into two tables that we join back together again to identify and filter out duplicates on the row id. Basically, no row id should appear twice or we will over count.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Add a count of the number of subscriptions over the years</span>
+ipsa<span class="op">$</span>id &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(ipsa)
+erg1 &lt;-<span class="st"> </span>ipsa <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(clean_description <span class="op">==</span><span class="st"> &quot;ERG&quot;</span>)
+erg2 &lt;-<span class="st"> </span>ipsa <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(clean_details  <span class="op">==</span><span class="st"> &quot;ERG&quot;</span>)
+
+<span class="co"># bind, identify duplicates and filter to non-duplicated entries. </span>
+
+erg &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(erg1, erg2) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">duplicated =</span> <span class="kw">duplicated</span>(.<span class="op">$</span>id)) <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(duplicated <span class="op">==</span><span class="st"> &quot;FALSE&quot;</span>)
+
+<span class="kw">rm</span>(erg1, erg2)</code></pre></div>
+<p>The annual subscription rate for the ERG is presently £2000. We need to check for entries in a given financial year that exceed that for review.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># test count of subscription levels by year</span>
+erg_count &lt;-<span class="st"> </span>erg <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">group_by</span>(year, member_id, mps_name, display_as, current_role) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">tally</span>(amount_claimed, <span class="dt">sort =</span> <span class="st">&quot;TRUE&quot;</span>)
+<span class="kw">head</span>(erg_count)
+<span class="co">#&gt; # A tibble: 6 x 6</span>
+<span class="co">#&gt; # Groups:   year, member_id, mps_name, display_as [6]</span>
+<span class="co">#&gt;   year  member_id mps_name          display_as          current_role     n</span>
+<span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;             &lt;chr&gt;               &lt;chr&gt;        &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 13_14 373       David Davis       Mr David Davis      MP           4000.</span>
+<span class="co">#&gt; 2 14_15 1462      Angela Watkinson  Dame Angela Watkin… Ex           4000.</span>
+<span class="co">#&gt; 3 17_18 4639      Bim Afolami       Bim Afolami         MP           4000.</span>
+<span class="co">#&gt; 4 12_13 4140      David Nuttall     Mr David Nuttall    Ex           3950.</span>
+<span class="co">#&gt; 5 13_14 1405      Mark Field        Mark Field          MP           2000.</span>
+<span class="co">#&gt; 6 13_14 1425      Jonathan Djanogly Mr Jonathan Djanog… MP           2000.</span></code></pre></div>
+<p>There are four entries that are over 2000 in a given year that need investigation and may require adjustment if they involve a repayment. The details of the four entries are:</p>
+<ol style="list-style-type: decimal">
+<li>14_15 1462 Angela Watkinson 4000</li>
+</ol>
+<p>This involves three entries on the same day with one listed as a repayment. This suggests an accidental double claim and correction through repayment. This can be reduced to a single payment.</p>
+<ol start="2" style="list-style-type: decimal">
+<li><p>17_18 4639 Bim Afolami 4000. Appears as two payments on the same day in the 2017-2018 expenses. A check in the original csv reveals the double entry. This can reasonably be reduced to a single payment.</p></li>
+<li><p>13_14 373 David Davis 4000. Two entries. One at the start of the financial year and one at the end on the 2014-03-20 with no entry for 14_15 signifying a payment for that year shortly before the end of the previous financial year.</p></li>
+<li><p>12_13 4140 David Nuttall 3950. First payment on 12_13 2012-04-11 then on 2013-03-25. No entry for 14_15 signifying an advanced payment in the previous financial year.</p></li>
+</ol>
+<p>To correct for the Angela Watkinson double entry the entries for 2014-2015 will be reduced to one by removing claim_no 365591 using <code>!=</code> for not. We can do the same for the Bim Afolami double entry using the id column to arrive at the final set.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">erg &lt;-<span class="st"> </span>erg <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(claim_no <span class="op">!=</span><span class="st"> &quot;365591&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(id <span class="op">!=</span><span class="st"> &quot;1323443&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">subscription_count =</span> <span class="kw">rep_len</span>(<span class="dv">1</span>, <span class="dt">length.out =</span> <span class="kw">nrow</span>(.)))</code></pre></div>
+<p>We are now in a position to count the number of subscriptions over time and to sum the value of subscriptions.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">erg_subscriptions &lt;-<span class="st"> </span>erg <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">group_by</span>(member_id, mps_name, display_as, current_role, mps_constituency) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarise_at</span>(<span class="kw">c</span>(<span class="st">&quot;subscription_count&quot;</span>, <span class="st">&quot;amount_claimed&quot;</span>), sum) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(subscription_count))
+
+erg_subscriptions <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(member_id, mps_name, display_as, current_role, subscription_count, amount_claimed)
+<span class="co">#&gt; # A tibble: 53 x 6</span>
+<span class="co">#&gt; # Groups:   member_id, mps_name, display_as, current_role [53]</span>
+<span class="co">#&gt;    member_id mps_name       display_as      current_role subscription_cou…</span>
+<span class="co">#&gt;    &lt;chr&gt;     &lt;chr&gt;          &lt;chr&gt;           &lt;chr&gt;                    &lt;dbl&gt;</span>
+<span class="co">#&gt;  1 1444      Mark Francois  Mr Mark Franco… MP                          8.</span>
+<span class="co">#&gt;  2 4133      Andrew Bridgen Andrew Bridgen  MP                          8.</span>
+<span class="co">#&gt;  3 47        Gerald Howarth Sir Gerald How… Ex                          8.</span>
+<span class="co">#&gt;  4 3977      Chris Heaton-… Chris Heaton-H… MP                          7.</span>
+<span class="co">#&gt;  5 40        Bernard Jenkin Mr Bernard Jen… MP                          7.</span>
+<span class="co">#&gt;  6 4140      David Nuttall  Mr David Nutta… Ex                          7.</span>
+<span class="co">#&gt;  7 4064      Steve Baker    Mr Steve Baker  MP                          6.</span>
+<span class="co">#&gt;  8 4075      Chris Pincher  Christopher Pi… MP                          6.</span>
+<span class="co">#&gt;  9 4099      Jacob Rees-Mo… Mr Jacob Rees-… MP                          6.</span>
+<span class="co">#&gt; 10 1551      Stewart Jacks… Mr Stewart Jac… Ex                          5.</span>
+<span class="co">#&gt; # ... with 43 more rows, and 1 more variable: amount_claimed &lt;dbl&gt;</span></code></pre></div>
+<p>If we wanted to add some additional data to this set from the concordance with data.parliament we would do something like the following.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">erg_subscriptions &lt;-<span class="st"> </span>ipsa_commons <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(member_id, member_from, gender, date_of_birth, laying_minister_name, house_start_date) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">right_join</span>(., erg_subscriptions, <span class="dt">by =</span> <span class="st">&quot;member_id&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">select</span>(member_id, display_as, member_from, gender, date_of_birth, laying_minister_name, house_start_date, current_role, amount_claimed, subscription_count)</code></pre></div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

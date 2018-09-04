@@ -1,0 +1,498 @@
+---
+title: "Name Matching between IPSA and data.parliament"
+author: "Paul Oldham"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  cache = FALSE,
+  message = FALSE, 
+  warning = FALSE
+)
+```
+
+This vignette documents the process of matching data from the `Independent Parliamentary Standards Authority` (IPSA) with the `data.parliament Members' Name Data Platform`. It consists of the steps involved in processing the data in R to arrive at accurate matches and counts for consistency between the `IPSA` records and the `data.parliament` records. This proved to be quite involved and is documented here to assist with understanding how the data package was created. 
+
+The `data.parliament` service provides access to a wide range of information on the UK Parliament. One of the main services is the [Members Name Data Platform](http://data.parliament.uk/membersdataplatform/memberquery.aspx#membershipinfotable), formerly known as the Members Name Information Service or MNIS. The service can be accessed through the [`mnis`](https://github.com/evanodell/mnis) package by Evan Odell. Additional information can be gained as needed from the [`hansard`](https://github.com/evanodell/hansard) package. We will use the convention `data.parliament` when referring to the names service.
+
+The list of all former and current members (MPs and Lords) can be obtained through the `mnis` package using `mnis::mnis_all_members()`. This includes the data services IDs for members of parliament that can be used to link to other sources of public `data.parliament` information on Members. 
+
+```{r all_members, eval=FALSE}
+install.packages("mnis")
+library(mnis)
+members <- mnis_all_members()
+```
+
+Unfortunately, the IPSA data is not particularly consistent with the `data.parliament` name format which lists names as surname, first name with optional honorifics. This requires some cleaning and adjustment to resolve. 
+
+Our aim is to create a data table that matches the names of MPs listed in the IPSA records with the `data.parliament` data. This involves five main issues.
+
+a) Variations in the names used in IPSA and in `data.parliament`.
+b) The departure of MPs from the House of Commons
+c) The movement of MPs from the House of Commons to the House of Lords. At this point their names change from being `first name, second name` to `Lord or Baron or Baroness surname of place` in the `data.parliament` records. 
+d) MPs who have not submitted an expenses claim to IPSA during their membership. This affects 2 new MPs in IPSA period to the end of March 2018.  
+
+As we are dealing with 952 names in the IPSA records and 4,695 names in `data.parliament` (all members data) this can get complicated and requires a lot of cross checking. We were obliged to feel our way forward with this and to engage in some manual clean up. It would be useful in future is IPSA and `data.parliament` harmonised their approaches to names and if IPSA adopted the `data.parliament` member ids as a key. 
+
+### Preparing the data.parliament data
+
+We can make progress by recognising that IPSA covers the expenses of Members of Parliament (not the House of Lords). We therefore confine the data_parliamnent data to MPs. We can use the `house` column in `mnis_all_members` to filter the data only to members of the Commons. 
+
+```{r load_members, echo=FALSE}
+library(tidyverse)
+load("members.rda")
+```
+
+```{r filter_members, message=FALSE}
+library(tidyverse)
+commons <- members %>%
+  dplyr::filter(house == "Commons")
+```
+
+That reduces the `data.parliament` data by just over half. We could further limit the data on the `current_status_name` to Current members but we will not go there yet. Note that we will pick up former members who are now members of the lords further on in the process. 
+
+We will exclude former MPs who left the house before the IPSA expenses claims system started in May 2010 using the `house_end_date` field. The challenge here is that those MPs who are current MPs appear as NA in this column. 
+
+We deal with that by creating a temporary end date field and using `replace_na()` to create a date that is current. We will drop this modified column later and revert to the original using the IDs.
+
+There are 650 current serving MPs and so we should be expecting to obtain the list of all MPs from 2010 onwards. There were General Elections in the UK on the 6th of May 2010, the 7th of May 2015 and the 8th of June 2017. Following by elections two new MPs joined the commons after the June 2017 elections. 
+
+```{r commons_mutate}
+commons <- commons %>%
+  mutate(house_end_date = lubridate::ymd(.$house_end_date)) %>%
+  mutate(temp_end = house_end_date) %>%
+  replace_na(list(temp_end = "2018-06-01")) %>%
+  dplyr::filter(temp_end >= "2010-01-01" & temp_end <= "2018-06-01")
+
+# Test that the current status active and the temp_end date counts match. Target is 650
+
+commons %>% dplyr::filter(current_status_is_active == "True") %>% nrow() # 650
+
+commons %>% dplyr::filter(temp_end == "2018-06-01") %>% nrow() # 650
+```
+
+#### Create a name matching field
+
+Our aim is to arrive at temporary name fields in `commons` that is as close as possible to the names in IPSA. To do that we will create a `commons_short` name from the `data.parliament` `display_as` field and remove the honorifics. 
+
+We need to be a little careful about the Miss, Ms honorifics and to not replace the Dr in names like Drax. So in all cases we will replace the honorifics using a trailing space.
+
+```{r commons_short}
+# create commons_short preserving the original commons dp display_as field
+
+commons$commons_short <- commons$display_as
+
+# remove honorifics from commons_short
+commons$commons_short <- str_replace(commons$commons_short, "Miss ", "") %>% 
+  str_replace(., "Mrs ", "") %>%
+  str_replace(., "Ms ", "") %>% 
+  str_replace(., "Mr ", "") %>% 
+  str_replace(., "Dr ", "") %>% 
+  str_replace(., "Sir ", "") %>% 
+  str_replace(., "Dame ", "")
+
+commons$commons_short <- trimws(commons$commons_short, which = "both")
+
+# Note that the honorific Lady is not included in the list above to
+# avoid reducing Lady Hermon to a non-matching Hermon. Hyphens in names 
+# are retained because they are more frequent than versions of names 
+# without hyphens. 
+```
+
+
+#### Duplicate Names and Name Variants
+
+- Mike Wood and Mike B Wood
+
+In the `data.parliament` `commons` table created above there are two Mike Wood entries. Mike B Wood is the Conservative MP for Dudley South BC in the IPSA record while Mike Wood is the Labour MP for Batley and Spen BC.
+
+So, for clarity the MP for Dudley South entry is converted to Mike B Wood in the `commons` record to match with the IPSA approach using the `data.parliament` ID 4384 and editing the relevant row. 
+
+```{r wood}
+editrow <- which(commons$member_id == "4384")
+# change the short name to match ipsa
+commons[editrow,]$commons_short <- "Mike B Wood"
+```
+
+We now create an active MP table to use later on. This reveals the 650 MPs who are our target. 
+
+```{r active}
+active <- commons %>%
+  dplyr::filter(temp_end == "2018-06-01")
+```
+
+### Preparing IPSA names
+
+We can now address the IPSA names.
+
+```{r load_ipsa_source, echo=FALSE}
+load("ipsa_source.rda")
+ipsa <- ipsa_source
+rm(ipsa_source)
+```
+
+We now load the ipsa data table and create a copy of the `mps_name` field to use in matching
+
+```{r ipsa_match_field}
+ipsa$commons_short <- ipsa$mps_name
+```
+
+There are a number of ipsa names that require editing to match data.parliament records. Two names Vince and Vincent Cable and Martin Docherty and Docherty-Hughes are duplicates within the ipsa data. A number of others are minor variants of the data.parliament name with one name change following marriage. These are adjusted to match the commons short names from the data.parliament data. Note that the IPSA original names are not changed. This introduces duplication on Cable and Docherty in the workings that is addressed at the end of the clean up.  
+
+```{r}
+ipsa <- ipsa %>%
+  mutate(commons_short =  str_replace_all(commons_short, "Vincent Cable", "Vince Cable")) %>%
+  mutate(commons_short = str_replace_all(commons_short, "Sylvia Hermon", "Lady Hermon")) %>%
+  mutate(commons_short = str_replace_all(commons_short, "Suella Fernandes", "Suella Braverman")) %>%
+  mutate(commons_short = str_replace_all(commons_short, "Chris Shaun Ruane", "Chris Ruane")) %>%
+  mutate(commons_short = str_replace(commons_short, "^Martin Docherty$", "Martin Docherty-Hughes")) %>%
+  mutate(commons_short = str_replace(commons_short, "Preet Gill", "Preet Kaur Gill")) %>%
+  mutate(commons_short = str_replace(commons_short, "Emma Little-Pengelly", "Emma Little Pengelly"))
+```
+
+### Testing for Duplicates
+
+We now test for duplicates. 
+
+```{r test_duplicates}
+ipsa_name <- ipsa %>% 
+  count(mps_name, mps_constituency, commons_short) %>%
+  arrange(commons_short) %>% 
+  mutate(duplicate = duplicated(commons_short))
+```
+
+This reveals four duplicates. The two cases mentioned above and cases where two MPs have moved constituency over the course of their careers. Considerable care is required when editing by position in R. 
+
+```{r mcvey}
+ipsa_name <- ipsa_name %>% arrange(commons_short)
+ipsa_name[290,]$mps_constituency <- "formerly Wirral West, now Tatton"
+ipsa_name[291,]$mps_constituency <- "formerly Wirral West, now Tatton"
+ipsa_name <- ipsa_name[-291,]
+```
+
+A second case is dealt with the same way. 
+
+```{r lloyd}
+ipsa_name[924,]$mps_constituency <- "formerly Manchester Central CC, now Rochdale CC"
+ipsa_name[925,]$mps_constituency <- "formerly Manchester Central CC, now Rochdale CC"
+ipsa_name <- ipsa_name[-925,]
+```
+
+We now try matching the commons_short names between the two tables. The ipsa_name table has 952 rows and commons has 1121. We want to match the 950 (from 952 names including the two duplicates)
+
+```{r match_commons}
+# identify matches
+ipsa_name$commons_shortmatch <- ipsa_name$commons_short %in% commons$commons_short
+
+# count matches
+ipsa_name %>% filter(commons_shortmatch == TRUE) %>% nrow() # 887 rows
+
+```
+
+We now identify the matched and create a missing table for adjustments.  
+
+```{r matched}
+matched <- ipsa_name %>% dplyr::filter(commons_shortmatch == "TRUE")
+nrow(matched)
+```
+
+```{r missed}
+missed <- ipsa_name %>%
+  dplyr::filter(commons_shortmatch == "FALSE")
+nrow(missed)
+```
+
+In total 65 names do not match between the two sets. At this point we have some choices. We could for example use the constituency names to match the names and we could also use the `refinr` package. However, quite a number of these names are for MPs who have moved to the Lords and it is not easy to predict what the name change will be. I decided to go with a manual match using the constituency as the check criteria to create a new data frame with the matched names from members and former members. 
+
+Note that the addition of Lord, Baroness etc. refers to the `display_as` field in the `members` table and not the `commons_short` column. So additional filters will be needed for the Lords later. 
+
+```{r mps_name}
+display_as <- data_frame(mps_name = c("Lord Beith",
+                                    "Lord Haselhurst",
+                                    "Lord Darling of Roulanish",
+                                    "Lord Lansley",
+                                    "Lord Robathan",
+                                    "Lord Stunell",
+                                    "Lord Tyrie",
+                                    "Andrew Love",
+                                    "Angus Brendan MacNeil",
+                                    "Baroness McIntosh of Pickering",
+                                    "Anne Marie Morris",
+                                    "William Cash",
+                                    "Robert Neill",
+                                    "Brian H. Donohoe",
+                                    "Chi Onwurah",
+                                    "Christian Matheson",
+                                    "Christopher Pincher",
+                                    "Chris Elmore",
+                                    "Chris Leslie",
+                                    "Dan Byles",
+                                    "Dan Poulter",
+                                    "Lord Watts",
+                                    "Lord Blunkett",
+                                    "David T. C. Davies",
+                                    "Lord Willetts",
+                                    "Baroness Primarolo",
+                                    "Lord Foster of Bath",
+                                    "Lord Garnier",
+                                    "Liz McInnes",
+                                    "Lord Pickles",
+                                    "Lord Maude of Horsham",
+                                    "Lord Young of Cookham",
+                                    "Ged Killen",
+                                    "Graham P Jones",
+                                    "Lord Barker of Battle",
+                                    "Ian C. Lucas",
+                                    "Lord Arbuthnot of Edrom",
+                                    "Jeffrey M. Donaldson",
+                                    "Joseph Johnson",
+                                    "Lord Randall of Uxbridge",
+                                    "Viscount Thurso",
+                                    "Kenneth Clarke",
+                                    "Liz Saville Roberts",
+                                    "Baroness Burt of Solihull",
+                                    "Baroness Featherstone",
+                                    "Lord Bruce of Bennachie",
+                                    "Mary Macleod",
+                                    "Matt Hancock",
+                                    "Lord Campbell of Pittenweem",
+                                    "Naz Shah",
+                                    "Lord Murphy of Torfaen",
+                                    "Lord Hain",
+                                    "Lord Lilley",
+                                    "Philip Boswell",
+                                    "Siân C. James",
+                                    "Steve McCabe",
+                                    "Stewart Malcolm McDonald",
+                                    "Stuart Blair Donaldson",
+                                    "Stuart C. McDonald",
+                                    "Susan Elan Jones",
+                                    "Baroness Jowell",
+                                    "Thérèse Coffey",
+                                    "Lord Hague of Richmond",
+                                    "Lord McCrea of Magherafelt and Cookstown",
+                                    "William Bain"))
+```
+
+We now bind the two missed tables together and identify those with the Lords related honorifics.
+
+```{r}
+missed_bind <- bind_cols(missed, display_as) %>%
+  mutate(lords = str_detect(mps_name1, "^Lord|^Viscount|^Baroness"))
+```
+
+We now filter those who are MPs and tidy up as we move along. 
+
+```{r}
+missed_bind_mps <- missed_bind %>%
+  dplyr::filter(lords == "FALSE") %>%
+  select(-lords, -commons_shortmatch, -n, -commons_short) %>% # remove existing commons_short. I could be making a mistake here
+  rename(commons_short = mps_name1) # 34 mps with variant names
+```
+
+We do the same for the lords.
+
+```{r}
+missed_bind_lords <- missed_bind %>%
+  dplyr::filter(lords == "TRUE") %>%
+  rename(display_as = mps_name1) %>% 
+  select(-commons_shortmatch, - n) # 31 lords
+```
+
+Now we create a working table that joins the two. 
+
+```{r}
+found <- bind_rows(missed_bind_mps, missed_bind_lords)
+```
+
+```{r}
+mps_ipsa_commons <- bind_rows(matched, found) %>%
+  select(-n, -commons_shortmatch) 
+```
+
+We have a total of 952 names including the duplicate Cable and Docherty. Next we run a test that we have the correct number of active MPs from the active table we created earlier. 
+
+```{r}
+mps_ipsa_commons$active_mp <- mps_ipsa_commons$commons_short %in% active$commons_short
+
+mps_ipsa_commons %>% 
+  filter(active_mp == TRUE) %>% nrow() 
+```
+
+We are expecting 650 which includes the two duplicates. The total should be 652 because Janet Daby and Órfhlaith Begley are new MPs who do not yet appear in IPSA records. They are added in below. 
+
+### Testing for completeness
+
+We need a test for completeness against our expected target. 
+
+```{r}
+commons$ipsa_match <- commons$commons_short %in% mps_ipsa_commons$commons_short
+```
+
+Now we manually inspect the data expecting that all entries should be Ex MPs who left the commons before IPSA records started in May 2010. 
+
+```{r eval=FALSE}
+commons %>% 
+  dplyr::filter(ipsa_match == FALSE) %>% View()
+```
+
+An easy way to do this is to filter to those cases where the ipsa match is FALSE and arrange by the temp_end date. Any temp end data that is current requires investigation. 
+
+```{r}
+commons %>% 
+  dplyr::filter(ipsa_match == FALSE) %>%
+  arrange(desc(temp_end)) %>% 
+  select(temp_end, display_as, commons_short)
+```
+
+Here we observe the new MPs Janet Daby and Órfhlaith Begley.
+
+We have NA entries in the `active_mp` and in the lords columns in `mps_ipsa_commons`. We will fill these with the correct values (FALSE).
+
+```{r}
+mps_ipsa_commons$active_mp <- mps_ipsa_commons$active_mp %>%
+  replace_na("FALSE")
+
+mps_ipsa_commons$lords <- mps_ipsa_commons$lords %>%
+  replace_na("FALSE")
+```
+
+
+Next up we add the two missed active MPs.
+
+```{r}
+active$mps_ipsa_commons <-  active$commons_short %in% mps_ipsa_commons$commons_short
+
+# create a new mps table that matches mps_ipsa_commons column names
+newmps <- active %>% 
+  select(commons_short, mps_ipsa_commons) %>%
+  filter(mps_ipsa_commons == FALSE) %>%
+  mutate(mps_name = NA) %>%
+  mutate(mps_constituency = NA) %>%
+  mutate(active_mp = "TRUE") %>%
+  mutate(display_as = NA) %>%
+  mutate(lords = "FALSE") %>%
+  mutate(duplicate = FALSE) %>% 
+  select(-mps_ipsa_commons)
+
+# create the table
+
+mps_ipsa_commons <- bind_rows(mps_ipsa_commons, newmps)
+```
+
+We now have a table with 954 rows. We now want to pull in the additional data.parliament `members` data. However, the lords names are recorded in `display_as` rather than `commons_short` and so we need to split the two tables up and then add the new data and join back together again. 
+
+When dealing with the Lords note that some names are hereditary. This applies to Viscount Thurso and 3 entries will appear from the members table for Viscount Thurso. The code below removes the two predecessors to the present Viscount Thurso.
+
+```{r}
+ipsa_commons_lords <- mps_ipsa_commons %>%
+  filter(lords == TRUE) %>% 
+  left_join(., members, by = "display_as") %>% 
+  mutate(house_end_date = lubridate::date(house_end_date)) %>% 
+  mutate(current_role = "Lords") %>% 
+  filter(member_id != "2989" & member_id != "1784")
+```
+
+Next we deal with the MPs by identifying those who are existing and Ex MPs. 
+
+```{r}
+ipsa_commons_mps <- mps_ipsa_commons %>%
+  filter(lords == FALSE) %>%
+  left_join(., commons, by = "commons_short") %>%
+  select(-`display_as.x`) %>%
+  rename(display_as = `display_as.y`) %>%
+  mutate(house_end_date = lubridate::date(house_end_date))
+
+ipsa_commons_ex <- ipsa_commons_mps %>%
+  filter(temp_end != "2018-06-01") %>%
+  mutate(current_role = "Ex") # 271
+
+ipsa_commons_currentmp <- ipsa_commons_mps %>%
+  filter(temp_end == "2018-06-01") %>%
+  mutate(current_role = "MP")
+```
+
+Now we join the tables. We will add two columns from the existing data. One for `ipsa_name` and one for data.parliament `dp_name` to clarify the sources of the names. We will also tidy up the `ipsa_match` column so that MPs who later became lords are correctly identified as matching.
+
+```{r create_ipsa_commons}
+ipsa_commons <- bind_rows(ipsa_commons_currentmp, ipsa_commons_lords, ipsa_commons_ex) %>%
+  arrange(commons_short) %>%
+  mutate(ipsa_name = mps_name) %>%
+  mutate(dp_name = display_as)
+
+# replace NA for MPs who appear in IPSA but became Lords
+ipsa_commons$ipsa_match <- ipsa_commons$ipsa_match %>% 
+  replace_na("TRUE")
+```
+
+
+The next task is simply to add relevant data from ipsa_commons to the ipsa table. 
+
+### Add the data to IPSA
+
+We now want to add data to the IPSA table, notably the member_id and names. For the financial years May 2010 to end of March 2018 there were 1,446,217 rows. We should expect that to go up by two because we are adding the two new MPs who do not yet appear in ipsa. 
+
+```{r}
+ipsa <- ipsa_commons %>%
+  select(ipsa_name, mps_name, dp_name, member_id, current_role, commons_short) %>% 
+  left_join(., ipsa, by = "mps_name") %>% 
+  select(-`commons_short.y`) %>% 
+  rename(commons_short = `commons_short.x`)
+nrow(ipsa)
+```
+
+We now have a complete IPSA table with 1,446,219 records. 
+
+### Tidying Up
+
+We had preserved duplicate name entries for Vince and Vincent Cable and Martin Docherty/Docherty Hughes respectively. With the correct matching into IPSA to add the member_id the duplicates can now be removed. 
+
+```{r}
+ipsa_commons <- ipsa_commons %>% 
+  filter(duplicate == FALSE)
+```
+
+
+
+### Conclusion
+
+The main outcome of this process is the `ipsa_commons` table that provides a concordance between the IPSA and the `data.parliament` data. In addition, `data.parliament` data fields have been added to the corresponding IPSA expenses table.
+
+Issues to remember when using the package tables are:
+
+- New issues of IPSA data may produce new issues (notably name variants) and it takes a while for new MPs to appear in the system. IPSA data is also always a few months out of date. 
+- Parliamentary data is by its nature dynamic. MPs leave and enter the house between and after general elections, they may change name if the marry or if they move to the house of lords. 
+
+The practical significance of this is that new changes emerge in the data that need to be identified and a significant amount of cross checking is required. Much of this could be addressed if IPSA was to harmonise its approach with `data.parliament` notably on personal name conventions, member_ids and constituency names etc. The single most important change would be the use of member-ids. However, a way to address the movement of MPs to the Lords would probably need to be addressed. 
+
+
+
+
+```{r write_files, echo=FALSE, eval=FALSE}
+# tidy up prior to save
+commons <- commons %>% select(-temp_end, - ipsa_match)
+ipsa_commons <- ipsa_commons %>% select(-temp_end, - ipsa_match)
+
+# file locations
+save(ipsa_commons, file = "ipsa_commons.rda", compress = "xz")
+save(commons, file = "commons.rda", compress = "xz")
+save(ipsa, file = "ipsa.rda", compress = "xz")
+save(members, file = "members.rda", compress = "xz")
+write_csv(ipsa, "ipsa.csv")
+```
+
+```{r chcek_count, echo=FALSE, eval=FALSE}
+#check count
+ipsa_commons %>%
+  dplyr::filter(current_role == "MP") %>%
+  nrow() # expect that 650
+```
+

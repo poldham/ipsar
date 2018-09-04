@@ -1,0 +1,194 @@
+---
+title: "Exploring Pooled Services"
+author: "Paul Oldham"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>", 
+  cache = FALSE
+)
+```
+
+MPs can pool expenses to pay for shared resources under a system called `pooled services`. Pooled services are typically for research services such as the payment of researchers salaries and associated costs. At the time of writing there were five such services.
+
+- The Parliamentary Support Team (PST) provides pooled services to Liberal Democrat MPs 
+- The Parliamentary Research Service (PRS) provides pooled services to Labour Party MPs
+- The Policy Research Unit (PRU) provides pooled services to Conservative Party MPs. 
+- The European Research Group (ERG) provides research and briefing materials to Conservative MPs on issues relating to the UK’s relationship with the European Union.
+- The Scottish National Party (SNP) Research Team provides pooled services to SNP MPs.
+
+IPSA has produced an an assessment of pooled services [Assurance Review: Pooled Services, Assessment of risks, controls and compliance, 2015-2016](https://www.theipsa.org.uk/media/184678/pooled-services-assurance-report_final.pdf) that was last updated in 2017.
+
+MPs pay for these services through subscription fees that are then reclaimed as expenses. At present the package does not compile this data. Initial exploration of the data reveals that the descriptions of these services varies and affects our ability to accurately capture expenses claims. We can however get an initial idea of what might be involved by simply searching for research in the data and seeking to capture variants:
+
+```{r data_ipsa, echo=FALSE}
+library(ipsar)
+data("ipsa")
+```
+
+```{r research, message=FALSE}
+library(tidyverse)
+ipsa$research <- str_detect(ipsa$short_description, " Research*")
+
+research <- ipsa %>% dplyr::filter(research == "TRUE") %>% 
+  select(expense_type, short_description, details)
+
+head(research)
+```
+
+As this makes clear, this data is rather messy and would require care in cleaning up. As we will see in the example below, the details of expenses may be spread across multiple columns.
+
+The European Research Group (ERG) is a topical example of one such pooled service that illustrates the work involved in arriving at a clean and tidy dataset. 
+
+MPs subscriptions to the ERG are recorded in the `short_description` column and in the `details` column. This is likely to be the case for other pooled services. 
+
+Rather than focus on the most efficient route to name cleaning (e.g. using regular expressions) a simpler approach involving identification and standardization of variants is used with the `stringr` package which forms part of the `tidyverse`. The benefit of this approach is that it is more transparent and easier to track variants and make corrections over time. We put the cleaned up data in a new column called `clean_description`.
+
+```{r clean_description, message=FALSE}
+library(tidyverse)
+ipsa$clean_description <- ipsa$short_description %>%
+  str_replace_all("European Research Group", "ERG") %>%
+  str_replace_all("EUROPEAN RESEARCH GROUP", "ERG") %>%
+  str_replace_all("European Research Group staff", "ERG") %>%
+  str_replace_all("110516 - ERG Membership", "ERG") %>%
+  str_replace_all("ERG Fees", "ERG") %>% 
+  str_replace_all("ERG Payment", "ERG") %>%
+  str_replace_all("ERG Researcher", "ERG") %>%
+  str_replace_all("ERG Sub 2011-12", "ERG") %>%
+  str_replace_all("ERG subscription", "ERG") %>% 
+  str_replace("ERG 2010/2011", "ERG")
+```
+
+In some cases the reference to the pooled service is not contained in the `short_description` field but in the `details` field. We therefore need to run the same exercise with the details field based on manual inspection of summaries of this field. To manually inspect the data we can use the following and hunt through for entries relevant to the pooled service we are looking for. There is a lot to review and hence we use `View()`
+
+```{r view_ipsa, eval=FALSE}
+ipsa %>% count(details) %>% View()
+```
+
+It turns out that references to the subscriptions in the details field contain characters such as `[***]` and `()` that cause problems if we try to replace them in a straightforward way. We therefore use a couple of regular expressions at the beginning of the tidy up and edit the named entries to exclude those for matching. This will only be as good as our ability to spot the variants in the data. 
+
+```{r clean_details}
+ipsa$clean_details <- ipsa$details %>%
+  str_replace_all("\\[([^]]*)]", "") %>% # remove hard brackets and ***
+  str_replace_all("[(]|[)]", "") %>% # remove brackets
+  str_replace_all("European Research Group", "ERG") %>%
+  str_replace_all("EUROPEAN RESEARCH GROUP", "ERG") %>%
+  str_replace_all("2010 EUROPEAN RESERCH GROUP", "ERG") %>%
+  str_replace_all("Annual subs European Research Group", "ERG") %>%
+  str_replace_all("European Research Group for 2010/11", "ERG") %>% 
+  str_replace_all("European Research Group Membership", "ERG") %>%
+  str_replace_all("European Research Group pooled staff", "ERG") %>%
+  str_replace_all("European Research Group Researcher", "ERG") %>%
+  str_replace_all("European Research Group Subscription", "ERG") %>% 
+  str_replace_all("Membership for the European Research Group", "ERG") %>% 
+  str_replace_all("Research Services - European Research Group ", "ERG") %>% 
+  str_replace_all("Membership for European Research Group for Committee Purposes", "ERG") %>% 
+  str_replace_all("Research Services - European Research Group ", "ERG") %>% 
+  str_replace_all("Research services on European issues, in support of Parliamentary functions", "ERG") %>% 
+  str_replace_all("ERG Pooled staffing", "ERG") %>% 
+  str_replace_all("ERG services from pooled staff member as previous year", "ERG") %>% 
+  str_replace_all("ERG subscription", "ERG") %>% 
+  str_replace_all("ERG Subscription", "ERG") %>% 
+  str_replace_all("ERG subscription ", "ERG") %>% 
+  str_replace_all("ERG subscription-", "ERG") %>% 
+  str_replace_all("ERG subscriptionIP", "ERG") %>% 
+  str_replace_all("ERG for 2010/11", "ERG") %>% 
+  str_replace_all("ERG Researcher", "ERG") %>% 
+  str_replace_all("Membership for ERG for Committee purposes", "ERG") %>%
+  str_replace_all("ERG Membership", "ERG") %>% 
+  str_replace_all("ERGservices from pooled staff member as previous year", "ERG") %>% 
+  str_replace_all("Annual subs ERG", "ERG") %>% 
+  str_replace_all("Annual Sub 2013-14", "ERG") %>% 
+  str_replace_all("ERG Membership", "ERG") %>% 
+  str_replace_all("PART STAFFING COSTS FOR ERGBACS payment received", "ERG") %>% 
+  str_replace_all("PART STAFFING COSTS FOR ERG ", "ERG") %>% 
+  str_replace_all("ERGIP", "ERG") %>% 
+  str_replace_all("ERG ", "ERG") %>% 
+  str_replace_all("ERG-", "ERG") 
+```
+
+We can now take a look at summarising the subscribers. We add an id by row to assist with identifying duplicates and break the data into two tables that we join back together again to identify and filter out duplicates on the row id. Basically, no row id should appear twice or we will over count.  
+
+```{r create_erg}
+# Add a count of the number of subscriptions over the years
+ipsa$id <- 1:nrow(ipsa)
+erg1 <- ipsa %>% dplyr::filter(clean_description == "ERG")
+erg2 <- ipsa %>% dplyr::filter(clean_details  == "ERG")
+
+# bind, identify duplicates and filter to non-duplicated entries. 
+
+erg <- bind_rows(erg1, erg2) %>% 
+  mutate(duplicated = duplicated(.$id)) %>%
+  dplyr::filter(duplicated == "FALSE")
+
+rm(erg1, erg2)
+```
+
+The annual subscription rate for the ERG is presently £2000. We need to check for entries in a given financial year that exceed that for review.
+
+```{r erg_count}
+# test count of subscription levels by year
+erg_count <- erg %>% 
+  group_by(year, member_id, mps_name, dp_name, current_role) %>% 
+  tally(amount_claimed, sort = "TRUE")
+head(erg_count)
+```
+
+There are four entries that are over 2000 in a given year that need investigation and may require adjustment if they involve a repayment. The details of the four entries are:
+
+1. 14_15 1462 Angela Watkinson 4000 
+
+This involves three entries on the same day with one listed as a repayment. This suggests an accidental double claim and correction through repayment. This can be reduced to a single payment. 
+
+2. 17_18 4639 Bim Afolami 4000. Appears as two payments on the same day in the 2017-2018 expenses. A check in the original csv reveals the double entry. This can reasonably be reduced to a single payment. 
+
+3. 13_14 373 David Davis 4000. Two entries. One at the start of the financial year and one at the end on the 2014-03-20 with no entry for 14_15 signifying advanced payment for 14-15 shortly before the end of the previous financial year. 
+
+4. 12_13 4140 David Nuttall 3950. First payment on 12_13 2012-04-11 then on 2013-03-25. No entry for 14_15 signifying an advanced payment in the previous financial year. 
+
+To correct for the Angela Watkinson double entry the entries for 2014-2015 will be reduced to one by removing claim_no 365591 using `!=` for not. We can do the same for the Bim Afolami double entry using the id column to arrive at the final set.
+
+```{r erg_adjust}
+erg <- erg %>%
+  dplyr::filter(claim_no != "365591") %>% 
+  dplyr::filter(id != "1323443") %>% 
+  mutate(subscription_count = rep_len(1, length.out = nrow(.)))
+```
+
+```{r erg_save, echo=FALSE}
+save(erg, file = "erg.rda", compress = "xz")
+```
+
+We are now in a position to count the number of subscriptions over time and to sum the value of subscriptions.  
+
+```{r erg_subscriptions}
+erg_subscriptions <- erg %>% 
+  group_by(member_id, ipsa_name, dp_name, current_role, mps_constituency) %>%
+  summarise_at(c("subscription_count", "amount_claimed"), sum) %>% 
+  arrange(desc(subscription_count))
+
+erg_subscriptions %>%
+  select(member_id, ipsa_name, dp_name, current_role, subscription_count, amount_claimed)
+```
+
+If we wanted to add some additional data to this set from the concordance with `data.parliament` we would do something like the following. 
+
+```{r erg_subscriptions1}
+erg_subscriptions <- ipsa_commons %>%
+  select(member_id, member_from, gender, date_of_birth, laying_minister_name, house_start_date) %>%
+  right_join(., erg_subscriptions, by = "member_id") %>% 
+  select(member_id, dp_name, member_from, gender, date_of_birth, laying_minister_name, house_start_date, current_role, amount_claimed, subscription_count)
+head(erg_subscriptions)
+```
+
+```{r echo=FALSE}
+save(erg_subscriptions, file = "erg_subscriptions.rda", compress = "xz")
+```

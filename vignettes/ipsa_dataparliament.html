@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Paul Oldham" />
+
+<meta name="date" content="2018-09-04" />
+
+<title>Name Matching between IPSA and data.parliament</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Name Matching between IPSA and data.parliament</h1>
+<h4 class="author"><em>Paul Oldham</em></h4>
+<h4 class="date"><em>2018-09-04</em></h4>
+
+
+
+<p>This vignette documents the process of matching data from the <code>Independent Parliamentary Standards Authority</code> (IPSA) with the <code>data.parliament Members' Name Data Platform</code>. It consists of the steps involved in processing the data in R to arrive at accurate matches and counts for consistency between the <code>IPSA</code> records and the <code>data.parliament</code> records. This proved to be quite involved and is documented here to assist with understanding how the data package was created.</p>
+<p>The <code>data.parliament</code> service provides access to a wide range of information on the UK Parliament. One of the main services is the <a href="http://data.parliament.uk/membersdataplatform/memberquery.aspx#membershipinfotable">Members Name Data Platform</a>, formerly known as the Members Name Information Service or MNIS. The service can be accessed through the <a href="https://github.com/evanodell/mnis"><code>mnis</code></a> package by Evan Odell. Additional information can be gained as needed from the <a href="https://github.com/evanodell/hansard"><code>hansard</code></a> package. We will use the convention <code>data.parliament</code> when referring to the names service.</p>
+<p>The list of all former and current members (MPs and Lords) can be obtained through the <code>mnis</code> package using <code>mnis::mnis_all_members()</code>. This includes the data services IDs for members of parliament that can be used to link to other sources of public <code>data.parliament</code> information on Members.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;mnis&quot;</span>)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">library</span>(mnis)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3">members &lt;-<span class="st"> </span><span class="kw">mnis_all_members</span>()</a></code></pre></div>
+<p>Unfortunately, the IPSA data is not particularly consistent with the <code>data.parliament</code> name format which lists names as surname, first name with optional honorifics. This requires some cleaning and adjustment to resolve.</p>
+<p>Our aim is to create a data table that matches the names of MPs listed in the IPSA records with the <code>data.parliament</code> data. This involves five main issues.</p>
+<ol style="list-style-type: lower-alpha">
+<li>Variations in the names used in IPSA and in <code>data.parliament</code>.</li>
+<li>The departure of MPs from the House of Commons</li>
+<li>The movement of MPs from the House of Commons to the House of Lords. At this point their names change from being <code>first name, second name</code> to <code>Lord or Baron or Baroness surname of place</code> in the <code>data.parliament</code> records.</li>
+<li>MPs who have not submitted an expenses claim to IPSA during their membership. This affects 2 new MPs in IPSA period to the end of March 2018.<br />
+</li>
+<li>Any MPs who left the house in the period between General Elections (one MP Barry McElduff left the House following the May 2017 General Election)</li>
+</ol>
+<p>As we are dealing with 952 names in the IPSA records 4695 names in data.parliament (all members) this can get complicated and requires a lot of cross checking. We were obliged to feel our way forward with this and to engage in some manual clean up. It would be useful in future is IPSA and <code>data.parliament</code> harmonised their approaches to names and if IPSA adopted the <code>data.parliament</code> member ids as a key.</p>
+<div id="preparing-the-data.parliament-data" class="section level3">
+<h3>Preparing the data.parliament data</h3>
+<p>We can make progress by recognising that IPSA covers the expenses of Members of Parliament (not the House of Lords). We therefore confine the data_parliamnent data to MPs. We can use the <code>house</code> column in <code>mnis_all_members</code> to filter the data only to members of the Commons.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(tidyverse)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">commons &lt;-<span class="st"> </span>members <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(house <span class="op">==</span><span class="st"> &quot;Commons&quot;</span>)</a></code></pre></div>
+<p>That reduces the <code>data.parliament</code> data by just over half. We could further limit the data on the <code>current_status_name</code> to Current members but we will not go there yet. Note that we will pick up former members who are now members of the lords further on in the process.</p>
+<p>We will exclude former MPs who left the house before the IPSA expenses claims system started in May 2010 using the <code>house_end_date</code> field. The challenge here is that those MPs who are current MPs appear as NA in this column.</p>
+<p>We deal with that by creating a temporary end date field and using <code>replace_na()</code> to create a date that is current. We will drop this modified column later and revert to the original using the IDs.</p>
+<p>There are 650 current serving MPs and so we should be expecting to obtain the list of all MPs from 2010 onwards. There were General Elections in the UK on the 6th of May 2010, the 7th of May 2015 and the 8th of June 2017. Following by elections two new MPs joined the commons after the June 2017 elections.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">commons &lt;-<span class="st"> </span>commons <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">house_end_date =</span> lubridate<span class="op">::</span><span class="kw">ymd</span>(.<span class="op">$</span>house_end_date)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">temp_end =</span> house_end_date) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="st">  </span><span class="kw">replace_na</span>(<span class="kw">list</span>(<span class="dt">temp_end =</span> <span class="st">&quot;2018-06-01&quot;</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(temp_end <span class="op">&gt;=</span><span class="st"> &quot;2010-01-01&quot;</span> <span class="op">&amp;</span><span class="st"> </span>temp_end <span class="op">&lt;=</span><span class="st"> &quot;2018-06-01&quot;</span>)</a>
+<a class="sourceLine" id="cb3-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co"># Test that the current status active and the temp_end date counts match. Target is 650</span></a>
+<a class="sourceLine" id="cb3-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb3-9" data-line-number="9">commons <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(current_status_is_active <span class="op">==</span><span class="st"> &quot;True&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">nrow</span>() <span class="co"># 650</span></a>
+<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co">#&gt; [1] 650</span></a>
+<a class="sourceLine" id="cb3-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb3-12" data-line-number="12">commons <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(temp_end <span class="op">==</span><span class="st"> &quot;2018-06-01&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">nrow</span>() <span class="co"># 650</span></a>
+<a class="sourceLine" id="cb3-13" data-line-number="13"><span class="co">#&gt; [1] 650</span></a></code></pre></div>
+<div id="create-a-name-matching-field" class="section level4">
+<h4>Create a name matching field</h4>
+<p>Our aim is to arrive at temporary name fields in <code>commons</code> that is as close as possible to the names in IPSA. To do that we will create a <code>commons_short</code> name from the <code>data.parliament</code> <code>display_as</code> field and remove the honorifics.</p>
+<p>We need to be a little careful about the Miss, Ms honorifics and to not replace the Dr in names like Drax. So in all cases we will replace the honorifics using a trailing space.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># create commons_short preserving the original commons dp display_as field</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">commons<span class="op">$</span>commons_short &lt;-<span class="st"> </span>commons<span class="op">$</span>display_as</a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co"># remove honorifics from commons_short</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6">commons<span class="op">$</span>commons_short &lt;-<span class="st"> </span><span class="kw">str_replace</span>(commons<span class="op">$</span>commons_short, <span class="st">&quot;Miss &quot;</span>, <span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="st">  </span><span class="kw">str_replace</span>(., <span class="st">&quot;Mrs &quot;</span>, <span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="st">  </span><span class="kw">str_replace</span>(., <span class="st">&quot;Ms &quot;</span>, <span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="st">  </span><span class="kw">str_replace</span>(., <span class="st">&quot;Mr &quot;</span>, <span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="st">  </span><span class="kw">str_replace</span>(., <span class="st">&quot;Dr &quot;</span>, <span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="st">  </span><span class="kw">str_replace</span>(., <span class="st">&quot;Sir &quot;</span>, <span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="st">  </span><span class="kw">str_replace</span>(., <span class="st">&quot;Dame &quot;</span>, <span class="st">&quot;&quot;</span>)</a>
+<a class="sourceLine" id="cb4-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb4-14" data-line-number="14">commons<span class="op">$</span>commons_short &lt;-<span class="st"> </span><span class="kw">trimws</span>(commons<span class="op">$</span>commons_short, <span class="dt">which =</span> <span class="st">&quot;both&quot;</span>)</a>
+<a class="sourceLine" id="cb4-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co"># Note that the honorific Lady is not included in the list above to</span></a>
+<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co"># avoid reducing Lady Hermon to a non-matching Hermon. Hyphens in names </span></a>
+<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="co"># are retained because they are more frequent than versions of names </span></a>
+<a class="sourceLine" id="cb4-19" data-line-number="19"><span class="co"># without hyphens. </span></a></code></pre></div>
+</div>
+<div id="duplicate-names-and-name-variants" class="section level4">
+<h4>Duplicate Names and Name Variants</h4>
+<ul>
+<li>Mike Wood and Mike B Wood</li>
+</ul>
+<p>In the <code>data.parliament</code> <code>commons</code> table created above there are two Mike Wood entries. Mike B Wood is the Conservative MP for Dudley South BC in the IPSA record while Mike Wood is the Labour MP for Batley and Spen BC.</p>
+<p>So, for clarity the MP for Dudley South entry is converted to Mike B Wood in the <code>commons</code> record to match with the IPSA approach using the <code>data.parliament</code> ID 4384 and editing the relevant row.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">editrow &lt;-<span class="st"> </span><span class="kw">which</span>(commons<span class="op">$</span>member_id <span class="op">==</span><span class="st"> &quot;4384&quot;</span>)</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co"># change the short name to match ipsa</span></a>
+<a class="sourceLine" id="cb5-3" data-line-number="3">commons[editrow,]<span class="op">$</span>commons_short &lt;-<span class="st"> &quot;Mike B Wood&quot;</span></a></code></pre></div>
+<p>We now create an active MP table to use later on. This reveals the 650 MPs who are our target.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">active &lt;-<span class="st"> </span>commons <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(temp_end <span class="op">==</span><span class="st"> &quot;2018-06-01&quot;</span>)</a></code></pre></div>
+</div>
+</div>
+<div id="preparing-ipsa-names" class="section level3">
+<h3>Preparing IPSA names</h3>
+<p>We can now address the IPSA names.</p>
+<p>We now load the ipsa data table and create a copy of the <code>mps_name</code> field to use in matching</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">ipsa<span class="op">$</span>commons_short &lt;-<span class="st"> </span>ipsa<span class="op">$</span>mps_name</a></code></pre></div>
+<p>There are a number of ipsa names that require editing to match data.parliament records. Two names Vince and Vincent Cable and Martin Docherty and Docherty-Smith are duplicates within the ipsa data. A number of others are minor variants of the data.parliament name with one name change following marriage. These are adjusted to match the commons short names from the data.parliament data. Note that the IPSA original names are not changed. This introduces duplication on Cable and Docherty in the workings that is addressed at the end of the clean up.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">ipsa &lt;-<span class="st"> </span>ipsa <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">commons_short =</span>  <span class="kw">str_replace_all</span>(commons_short, <span class="st">&quot;Vincent Cable&quot;</span>, <span class="st">&quot;Vince Cable&quot;</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">commons_short =</span> <span class="kw">str_replace_all</span>(commons_short, <span class="st">&quot;Sylvia Hermon&quot;</span>, <span class="st">&quot;Lady Hermon&quot;</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">commons_short =</span> <span class="kw">str_replace_all</span>(commons_short, <span class="st">&quot;Suella Fernandes&quot;</span>, <span class="st">&quot;Suella Braverman&quot;</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">commons_short =</span> <span class="kw">str_replace_all</span>(commons_short, <span class="st">&quot;Chris Shaun Ruane&quot;</span>, <span class="st">&quot;Chris Ruane&quot;</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">commons_short =</span> <span class="kw">str_replace</span>(commons_short, <span class="st">&quot;^Martin Docherty$&quot;</span>, <span class="st">&quot;Martin Docherty-Hughes&quot;</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-7" data-line-number="7"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">commons_short =</span> <span class="kw">str_replace</span>(commons_short, <span class="st">&quot;Preet Gill&quot;</span>, <span class="st">&quot;Preet Kaur Gill&quot;</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-8" data-line-number="8"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">commons_short =</span> <span class="kw">str_replace</span>(commons_short, <span class="st">&quot;Emma Little-Pengelly&quot;</span>, <span class="st">&quot;Emma Little Pengelly&quot;</span>))</a></code></pre></div>
+</div>
+<div id="testing-for-duplicates" class="section level3">
+<h3>Testing for Duplicates</h3>
+<p>We now test for duplicates.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">ipsa_name &lt;-<span class="st"> </span>ipsa <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="st">  </span><span class="kw">count</span>(mps_name, mps_constituency, commons_short) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="st">  </span><span class="kw">arrange</span>(commons_short) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">duplicate =</span> <span class="kw">duplicated</span>(commons_short))</a></code></pre></div>
+<p>This reveals four duplicates. The two cases mentioned above and cases where two MPs have moved constituency over the course of their careers. Considerable care is required when editing by position in R.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">ipsa_name &lt;-<span class="st"> </span>ipsa_name <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">arrange</span>(commons_short)</a>
+<a class="sourceLine" id="cb10-2" data-line-number="2">ipsa_name[<span class="dv">290</span>,]<span class="op">$</span>mps_constituency &lt;-<span class="st"> &quot;formerly Wirral West, now Tatton&quot;</span></a>
+<a class="sourceLine" id="cb10-3" data-line-number="3">ipsa_name[<span class="dv">291</span>,]<span class="op">$</span>mps_constituency &lt;-<span class="st"> &quot;formerly Wirral West, now Tatton&quot;</span></a>
+<a class="sourceLine" id="cb10-4" data-line-number="4">ipsa_name &lt;-<span class="st"> </span>ipsa_name[<span class="op">-</span><span class="dv">291</span>,]</a></code></pre></div>
+<p>A second case is dealt with the same way.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">ipsa_name[<span class="dv">924</span>,]<span class="op">$</span>mps_constituency &lt;-<span class="st"> &quot;formerly Manchester Central CC, now Rochdale CC&quot;</span></a>
+<a class="sourceLine" id="cb11-2" data-line-number="2">ipsa_name[<span class="dv">925</span>,]<span class="op">$</span>mps_constituency &lt;-<span class="st"> &quot;formerly Manchester Central CC, now Rochdale CC&quot;</span></a>
+<a class="sourceLine" id="cb11-3" data-line-number="3">ipsa_name &lt;-<span class="st"> </span>ipsa_name[<span class="op">-</span><span class="dv">925</span>,]</a></code></pre></div>
+<p>We now try matching the commons_short names between the two tables. The ipsa_name table has 952 rows and commons has 1121. We want to match the 950 (from 952 names including the two duplicates)</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="co"># identify matches</span></a>
+<a class="sourceLine" id="cb12-2" data-line-number="2">ipsa_name<span class="op">$</span>commons_shortmatch &lt;-<span class="st"> </span>ipsa_name<span class="op">$</span>commons_short <span class="op">%in%</span><span class="st"> </span>commons<span class="op">$</span>commons_short</a>
+<a class="sourceLine" id="cb12-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="co"># count matches</span></a>
+<a class="sourceLine" id="cb12-5" data-line-number="5">ipsa_name <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(commons_shortmatch <span class="op">==</span><span class="st"> </span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">nrow</span>() <span class="co"># 887 rows</span></a>
+<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="co">#&gt; [1] 887</span></a></code></pre></div>
+<p>We now identify the matched and create a missing table for adjustments.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">matched &lt;-<span class="st"> </span>ipsa_name <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(commons_shortmatch <span class="op">==</span><span class="st"> &quot;TRUE&quot;</span>)</a>
+<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="kw">nrow</span>(matched)</a>
+<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="co">#&gt; [1] 887</span></a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">missed &lt;-<span class="st"> </span>ipsa_name <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(commons_shortmatch <span class="op">==</span><span class="st"> &quot;FALSE&quot;</span>)</a>
+<a class="sourceLine" id="cb14-3" data-line-number="3"><span class="kw">nrow</span>(missed)</a>
+<a class="sourceLine" id="cb14-4" data-line-number="4"><span class="co">#&gt; [1] 65</span></a></code></pre></div>
+<p>In total 65 names do not match between the two sets. At this point we have some choices. We could for example use the constituency names to match the names and we could also use the <code>refinr</code> package. However, quite a number of these names are for MPs who have moved to the Lords and it is not easy to predict what the name change will be. I decided to go with a manual match using the constituency as the check criteria to create a new data frame with the matched names from members and former members.</p>
+<p>Note that the addition of Lord, Baroness etc. refers to the <code>display_as</code> field in the <code>members</code> table and not the <code>commons_short</code> column. So additional filters will be needed for the Lords later.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">display_as &lt;-<span class="st"> </span><span class="kw">data_frame</span>(<span class="dt">mps_name =</span> <span class="kw">c</span>(<span class="st">&quot;Lord Beith&quot;</span>,</a>
+<a class="sourceLine" id="cb15-2" data-line-number="2">                                    <span class="st">&quot;Lord Haselhurst&quot;</span>,</a>
+<a class="sourceLine" id="cb15-3" data-line-number="3">                                    <span class="st">&quot;Lord Darling of Roulanish&quot;</span>,</a>
+<a class="sourceLine" id="cb15-4" data-line-number="4">                                    <span class="st">&quot;Lord Lansley&quot;</span>,</a>
+<a class="sourceLine" id="cb15-5" data-line-number="5">                                    <span class="st">&quot;Lord Robathan&quot;</span>,</a>
+<a class="sourceLine" id="cb15-6" data-line-number="6">                                    <span class="st">&quot;Lord Stunell&quot;</span>,</a>
+<a class="sourceLine" id="cb15-7" data-line-number="7">                                    <span class="st">&quot;Lord Tyrie&quot;</span>,</a>
+<a class="sourceLine" id="cb15-8" data-line-number="8">                                    <span class="st">&quot;Andrew Love&quot;</span>,</a>
+<a class="sourceLine" id="cb15-9" data-line-number="9">                                    <span class="st">&quot;Angus Brendan MacNeil&quot;</span>,</a>
+<a class="sourceLine" id="cb15-10" data-line-number="10">                                    <span class="st">&quot;Baroness McIntosh of Pickering&quot;</span>,</a>
+<a class="sourceLine" id="cb15-11" data-line-number="11">                                    <span class="st">&quot;Anne Marie Morris&quot;</span>,</a>
+<a class="sourceLine" id="cb15-12" data-line-number="12">                                    <span class="st">&quot;William Cash&quot;</span>,</a>
+<a class="sourceLine" id="cb15-13" data-line-number="13">                                    <span class="st">&quot;Robert Neill&quot;</span>,</a>
+<a class="sourceLine" id="cb15-14" data-line-number="14">                                    <span class="st">&quot;Brian H. Donohoe&quot;</span>,</a>
+<a class="sourceLine" id="cb15-15" data-line-number="15">                                    <span class="st">&quot;Chi Onwurah&quot;</span>,</a>
+<a class="sourceLine" id="cb15-16" data-line-number="16">                                    <span class="st">&quot;Christian Matheson&quot;</span>,</a>
+<a class="sourceLine" id="cb15-17" data-line-number="17">                                    <span class="st">&quot;Christopher Pincher&quot;</span>,</a>
+<a class="sourceLine" id="cb15-18" data-line-number="18">                                    <span class="st">&quot;Chris Elmore&quot;</span>,</a>
+<a class="sourceLine" id="cb15-19" data-line-number="19">                                    <span class="st">&quot;Chris Leslie&quot;</span>,</a>
+<a class="sourceLine" id="cb15-20" data-line-number="20">                                    <span class="st">&quot;Dan Byles&quot;</span>,</a>
+<a class="sourceLine" id="cb15-21" data-line-number="21">                                    <span class="st">&quot;Dan Poulter&quot;</span>,</a>
+<a class="sourceLine" id="cb15-22" data-line-number="22">                                    <span class="st">&quot;Lord Watts&quot;</span>,</a>
+<a class="sourceLine" id="cb15-23" data-line-number="23">                                    <span class="st">&quot;Lord Blunkett&quot;</span>,</a>
+<a class="sourceLine" id="cb15-24" data-line-number="24">                                    <span class="st">&quot;David T. C. Davies&quot;</span>,</a>
+<a class="sourceLine" id="cb15-25" data-line-number="25">                                    <span class="st">&quot;Lord Willetts&quot;</span>,</a>
+<a class="sourceLine" id="cb15-26" data-line-number="26">                                    <span class="st">&quot;Baroness Primarolo&quot;</span>,</a>
+<a class="sourceLine" id="cb15-27" data-line-number="27">                                    <span class="st">&quot;Lord Foster of Bath&quot;</span>,</a>
+<a class="sourceLine" id="cb15-28" data-line-number="28">                                    <span class="st">&quot;Lord Garnier&quot;</span>,</a>
+<a class="sourceLine" id="cb15-29" data-line-number="29">                                    <span class="st">&quot;Liz McInnes&quot;</span>,</a>
+<a class="sourceLine" id="cb15-30" data-line-number="30">                                    <span class="st">&quot;Lord Pickles&quot;</span>,</a>
+<a class="sourceLine" id="cb15-31" data-line-number="31">                                    <span class="st">&quot;Lord Maude of Horsham&quot;</span>,</a>
+<a class="sourceLine" id="cb15-32" data-line-number="32">                                    <span class="st">&quot;Lord Young of Cookham&quot;</span>,</a>
+<a class="sourceLine" id="cb15-33" data-line-number="33">                                    <span class="st">&quot;Ged Killen&quot;</span>,</a>
+<a class="sourceLine" id="cb15-34" data-line-number="34">                                    <span class="st">&quot;Graham P Jones&quot;</span>,</a>
+<a class="sourceLine" id="cb15-35" data-line-number="35">                                    <span class="st">&quot;Lord Barker of Battle&quot;</span>,</a>
+<a class="sourceLine" id="cb15-36" data-line-number="36">                                    <span class="st">&quot;Ian C. Lucas&quot;</span>,</a>
+<a class="sourceLine" id="cb15-37" data-line-number="37">                                    <span class="st">&quot;Lord Arbuthnot of Edrom&quot;</span>,</a>
+<a class="sourceLine" id="cb15-38" data-line-number="38">                                    <span class="st">&quot;Jeffrey M. Donaldson&quot;</span>,</a>
+<a class="sourceLine" id="cb15-39" data-line-number="39">                                    <span class="st">&quot;Joseph Johnson&quot;</span>,</a>
+<a class="sourceLine" id="cb15-40" data-line-number="40">                                    <span class="st">&quot;Lord Randall of Uxbridge&quot;</span>,</a>
+<a class="sourceLine" id="cb15-41" data-line-number="41">                                    <span class="st">&quot;Viscount Thurso&quot;</span>,</a>
+<a class="sourceLine" id="cb15-42" data-line-number="42">                                    <span class="st">&quot;Kenneth Clarke&quot;</span>,</a>
+<a class="sourceLine" id="cb15-43" data-line-number="43">                                    <span class="st">&quot;Liz Saville Roberts&quot;</span>,</a>
+<a class="sourceLine" id="cb15-44" data-line-number="44">                                    <span class="st">&quot;Baroness Burt of Solihull&quot;</span>,</a>
+<a class="sourceLine" id="cb15-45" data-line-number="45">                                    <span class="st">&quot;Baroness Featherstone&quot;</span>,</a>
+<a class="sourceLine" id="cb15-46" data-line-number="46">                                    <span class="st">&quot;Lord Bruce of Bennachie&quot;</span>,</a>
+<a class="sourceLine" id="cb15-47" data-line-number="47">                                    <span class="st">&quot;Mary Macleod&quot;</span>,</a>
+<a class="sourceLine" id="cb15-48" data-line-number="48">                                    <span class="st">&quot;Matt Hancock&quot;</span>,</a>
+<a class="sourceLine" id="cb15-49" data-line-number="49">                                    <span class="st">&quot;Lord Campbell of Pittenweem&quot;</span>,</a>
+<a class="sourceLine" id="cb15-50" data-line-number="50">                                    <span class="st">&quot;Naz Shah&quot;</span>,</a>
+<a class="sourceLine" id="cb15-51" data-line-number="51">                                    <span class="st">&quot;Lord Murphy of Torfaen&quot;</span>,</a>
+<a class="sourceLine" id="cb15-52" data-line-number="52">                                    <span class="st">&quot;Lord Hain&quot;</span>,</a>
+<a class="sourceLine" id="cb15-53" data-line-number="53">                                    <span class="st">&quot;Lord Lilley&quot;</span>,</a>
+<a class="sourceLine" id="cb15-54" data-line-number="54">                                    <span class="st">&quot;Philip Boswell&quot;</span>,</a>
+<a class="sourceLine" id="cb15-55" data-line-number="55">                                    <span class="st">&quot;Siân C. James&quot;</span>,</a>
+<a class="sourceLine" id="cb15-56" data-line-number="56">                                    <span class="st">&quot;Steve McCabe&quot;</span>,</a>
+<a class="sourceLine" id="cb15-57" data-line-number="57">                                    <span class="st">&quot;Stewart Malcolm McDonald&quot;</span>,</a>
+<a class="sourceLine" id="cb15-58" data-line-number="58">                                    <span class="st">&quot;Stuart Blair Donaldson&quot;</span>,</a>
+<a class="sourceLine" id="cb15-59" data-line-number="59">                                    <span class="st">&quot;Stuart C. McDonald&quot;</span>,</a>
+<a class="sourceLine" id="cb15-60" data-line-number="60">                                    <span class="st">&quot;Susan Elan Jones&quot;</span>,</a>
+<a class="sourceLine" id="cb15-61" data-line-number="61">                                    <span class="st">&quot;Baroness Jowell&quot;</span>,</a>
+<a class="sourceLine" id="cb15-62" data-line-number="62">                                    <span class="st">&quot;Thérèse Coffey&quot;</span>,</a>
+<a class="sourceLine" id="cb15-63" data-line-number="63">                                    <span class="st">&quot;Lord Hague of Richmond&quot;</span>,</a>
+<a class="sourceLine" id="cb15-64" data-line-number="64">                                    <span class="st">&quot;Lord McCrea of Magherafelt and Cookstown&quot;</span>,</a>
+<a class="sourceLine" id="cb15-65" data-line-number="65">                                    <span class="st">&quot;William Bain&quot;</span>))</a></code></pre></div>
+<p>We now bind the two missed tables together and identify those with the Lords related honorifics.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">missed_bind &lt;-<span class="st"> </span><span class="kw">bind_cols</span>(missed, display_as) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb16-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">lords =</span> <span class="kw">str_detect</span>(mps_name1, <span class="st">&quot;^Lord|^Viscount|^Baroness&quot;</span>))</a></code></pre></div>
+<p>We now filter those who are MPs and tidy up as we move along.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">missed_bind_mps &lt;-<span class="st"> </span>missed_bind <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb17-2" data-line-number="2"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(lords <span class="op">==</span><span class="st"> &quot;FALSE&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb17-3" data-line-number="3"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>lords, <span class="op">-</span>commons_shortmatch, <span class="op">-</span>n, <span class="op">-</span>commons_short) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># remove existing commons_short. I could be making a mistake here</span></a>
+<a class="sourceLine" id="cb17-4" data-line-number="4"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">commons_short =</span> mps_name1) <span class="co"># 34 mps with variant names</span></a></code></pre></div>
+<p>We do the same for the lords.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">missed_bind_lords &lt;-<span class="st"> </span>missed_bind <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb18-2" data-line-number="2"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(lords <span class="op">==</span><span class="st"> &quot;TRUE&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">display_as =</span> mps_name1) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb18-4" data-line-number="4"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>commons_shortmatch, <span class="op">-</span><span class="st"> </span>n) <span class="co"># 31 lords</span></a></code></pre></div>
+<p>Now we create a working table that joins the two.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1">found &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(missed_bind_mps, missed_bind_lords)</a></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1">mps_ipsa_commons &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(matched, found) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb20-2" data-line-number="2"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>n, <span class="op">-</span>commons_shortmatch) </a></code></pre></div>
+<p>We have a total of 952 names including the duplicate Cable and Docherty. Next we run a test that we have the correct number of active MPs from the active table we created earlier.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">mps_ipsa_commons<span class="op">$</span>active_mp &lt;-<span class="st"> </span>mps_ipsa_commons<span class="op">$</span>commons_short <span class="op">%in%</span><span class="st"> </span>active<span class="op">$</span>commons_short</a>
+<a class="sourceLine" id="cb21-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb21-3" data-line-number="3">mps_ipsa_commons <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb21-4" data-line-number="4"><span class="st">  </span><span class="kw">filter</span>(active_mp <span class="op">==</span><span class="st"> </span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">nrow</span>() </a>
+<a class="sourceLine" id="cb21-5" data-line-number="5"><span class="co">#&gt; [1] 650</span></a></code></pre></div>
+<p>We are expecting 650 which includes the two duplicates. The total should be 652 because Janet Daby and Órfhlaith Begley are new MPs who do not yet appear in IPSA records. They are added in below.</p>
+</div>
+<div id="testing-for-completeness" class="section level3">
+<h3>Testing for completeness</h3>
+<p>We need a test for completeness against our expected target.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">commons<span class="op">$</span>ipsa_match &lt;-<span class="st"> </span>commons<span class="op">$</span>commons_short <span class="op">%in%</span><span class="st"> </span>mps_ipsa_commons<span class="op">$</span>commons_short</a></code></pre></div>
+<p>Now we manually inspect the data expecting that all entries should be Ex MPs who left the commons before IPSA records started in May 2010.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">commons <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb23-2" data-line-number="2"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(ipsa_match <span class="op">==</span><span class="st"> </span><span class="ot">FALSE</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">View</span>()</a></code></pre></div>
+<p>An easy way to do this is to filter to those cases where the ipsa match is FALSE and arrange by the temp_end date. Any temp end data that is current requires investigation.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1">commons <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb24-2" data-line-number="2"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(ipsa_match <span class="op">==</span><span class="st"> </span><span class="ot">FALSE</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb24-3" data-line-number="3"><span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(temp_end)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb24-4" data-line-number="4"><span class="st">  </span><span class="kw">select</span>(temp_end, display_as, commons_short)</a>
+<a class="sourceLine" id="cb24-5" data-line-number="5"><span class="co">#&gt; # A tibble: 202 x 3</span></a>
+<a class="sourceLine" id="cb24-6" data-line-number="6"><span class="co">#&gt;    temp_end   display_as         commons_short   </span></a>
+<a class="sourceLine" id="cb24-7" data-line-number="7"><span class="co">#&gt;    &lt;date&gt;     &lt;chr&gt;              &lt;chr&gt;           </span></a>
+<a class="sourceLine" id="cb24-8" data-line-number="8"><span class="co">#&gt;  1 2018-06-01 Órfhlaith Begley   Órfhlaith Begley</span></a>
+<a class="sourceLine" id="cb24-9" data-line-number="9"><span class="co">#&gt;  2 2018-06-01 Janet Daby         Janet Daby      </span></a>
+<a class="sourceLine" id="cb24-10" data-line-number="10"><span class="co">#&gt;  3 2010-05-06 Nick Ainger        Nick Ainger     </span></a>
+<a class="sourceLine" id="cb24-11" data-line-number="11"><span class="co">#&gt;  4 2010-05-06 Mr Peter Ainsworth Peter Ainsworth </span></a>
+<a class="sourceLine" id="cb24-12" data-line-number="12"><span class="co">#&gt;  5 2010-05-06 Janet Anderson     Janet Anderson  </span></a>
+<a class="sourceLine" id="cb24-13" data-line-number="13"><span class="co">#&gt;  6 2010-05-06 Hilary Armstrong   Hilary Armstrong</span></a>
+<a class="sourceLine" id="cb24-14" data-line-number="14"><span class="co">#&gt;  7 2010-05-06 Charlotte Atkins   Charlotte Atkins</span></a>
+<a class="sourceLine" id="cb24-15" data-line-number="15"><span class="co">#&gt;  8 2010-05-06 Mr Peter Atkinson  Peter Atkinson  </span></a>
+<a class="sourceLine" id="cb24-16" data-line-number="16"><span class="co">#&gt;  9 2010-05-06 John Austin        John Austin     </span></a>
+<a class="sourceLine" id="cb24-17" data-line-number="17"><span class="co">#&gt; 10 2010-05-06 Vera Baird         Vera Baird      </span></a>
+<a class="sourceLine" id="cb24-18" data-line-number="18"><span class="co">#&gt; # ... with 192 more rows</span></a></code></pre></div>
+<p>Here we observe the new MPs Janet Daby and Órfhlaith Begley.</p>
+<p>We have NA entries in the active mp and in the lords columns in <code>mps_ipsa_commons</code>. We will fill these with the correct values (FALSE).</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1">mps_ipsa_commons<span class="op">$</span>active_mp &lt;-<span class="st"> </span>mps_ipsa_commons<span class="op">$</span>active_mp <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb25-2" data-line-number="2"><span class="st">  </span><span class="kw">replace_na</span>(<span class="st">&quot;FALSE&quot;</span>)</a>
+<a class="sourceLine" id="cb25-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb25-4" data-line-number="4">mps_ipsa_commons<span class="op">$</span>lords &lt;-<span class="st"> </span>mps_ipsa_commons<span class="op">$</span>lords <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb25-5" data-line-number="5"><span class="st">  </span><span class="kw">replace_na</span>(<span class="st">&quot;FALSE&quot;</span>)</a></code></pre></div>
+<p>Next up we add the two missed active MPs.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1">active<span class="op">$</span>mps_ipsa_commons &lt;-<span class="st">  </span>active<span class="op">$</span>commons_short <span class="op">%in%</span><span class="st"> </span>mps_ipsa_commons<span class="op">$</span>commons_short</a>
+<a class="sourceLine" id="cb26-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb26-3" data-line-number="3"><span class="co"># create a new mps table that matches mps_ipsa_commons column names</span></a>
+<a class="sourceLine" id="cb26-4" data-line-number="4">newmps &lt;-<span class="st"> </span>active <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb26-5" data-line-number="5"><span class="st">  </span><span class="kw">select</span>(commons_short, mps_ipsa_commons) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb26-6" data-line-number="6"><span class="st">  </span><span class="kw">filter</span>(mps_ipsa_commons <span class="op">==</span><span class="st"> </span><span class="ot">FALSE</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb26-7" data-line-number="7"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">mps_name =</span> <span class="ot">NA</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb26-8" data-line-number="8"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">mps_constituency =</span> <span class="ot">NA</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb26-9" data-line-number="9"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">active_mp =</span> <span class="st">&quot;TRUE&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb26-10" data-line-number="10"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">display_as =</span> <span class="ot">NA</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb26-11" data-line-number="11"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">lords =</span> <span class="st">&quot;FALSE&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb26-12" data-line-number="12"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">duplicate =</span> <span class="ot">FALSE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb26-13" data-line-number="13"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>mps_ipsa_commons)</a>
+<a class="sourceLine" id="cb26-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb26-15" data-line-number="15"><span class="co"># create the table</span></a>
+<a class="sourceLine" id="cb26-16" data-line-number="16"></a>
+<a class="sourceLine" id="cb26-17" data-line-number="17">mps_ipsa_commons &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(mps_ipsa_commons, newmps)</a></code></pre></div>
+<p>We now have a table with 954 rows. We now want to pull in the additional data.parliament <code>members</code> data. However, the lords names are recorded in <code>display_as</code> rather than <code>commons_short</code> and so we need to split the two tables up and then add the new data and join back together again.</p>
+<p>When dealing with the Lords note that some names are hereditary. This applies to Viscount Thurso and 3 entries will appear frok the members table for Viscout Thurso. The code below removes the two predecessors to the present Viscount Thurso.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1">ipsa_commons_lords &lt;-<span class="st"> </span>mps_ipsa_commons <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb27-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(lords <span class="op">==</span><span class="st"> </span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb27-3" data-line-number="3"><span class="st">  </span><span class="kw">left_join</span>(., members, <span class="dt">by =</span> <span class="st">&quot;display_as&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb27-4" data-line-number="4"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">house_end_date =</span> lubridate<span class="op">::</span><span class="kw">date</span>(house_end_date)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb27-5" data-line-number="5"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">current_role =</span> <span class="st">&quot;Lords&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb27-6" data-line-number="6"><span class="st">  </span><span class="kw">filter</span>(member_id <span class="op">!=</span><span class="st"> &quot;2989&quot;</span> <span class="op">&amp;</span><span class="st"> </span>member_id <span class="op">!=</span><span class="st"> &quot;1784&quot;</span>)</a></code></pre></div>
+<p>Next we deal with the MPs by identifying those who are existing and Ex MPs.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1">ipsa_commons_mps &lt;-<span class="st"> </span>mps_ipsa_commons <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb28-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(lords <span class="op">==</span><span class="st"> </span><span class="ot">FALSE</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb28-3" data-line-number="3"><span class="st">  </span><span class="kw">left_join</span>(., commons, <span class="dt">by =</span> <span class="st">&quot;commons_short&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb28-4" data-line-number="4"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span><span class="st">`</span><span class="dt">display_as.x</span><span class="st">`</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb28-5" data-line-number="5"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">display_as =</span> <span class="st">`</span><span class="dt">display_as.y</span><span class="st">`</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb28-6" data-line-number="6"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">house_end_date =</span> lubridate<span class="op">::</span><span class="kw">date</span>(house_end_date))</a>
+<a class="sourceLine" id="cb28-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb28-8" data-line-number="8">ipsa_commons_ex &lt;-<span class="st"> </span>ipsa_commons_mps <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb28-9" data-line-number="9"><span class="st">  </span><span class="kw">filter</span>(temp_end <span class="op">!=</span><span class="st"> &quot;2018-06-01&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb28-10" data-line-number="10"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">current_role =</span> <span class="st">&quot;Ex&quot;</span>) <span class="co"># 271</span></a>
+<a class="sourceLine" id="cb28-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb28-12" data-line-number="12">ipsa_commons_currentmp &lt;-<span class="st"> </span>ipsa_commons_mps <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb28-13" data-line-number="13"><span class="st">  </span><span class="kw">filter</span>(temp_end <span class="op">==</span><span class="st"> &quot;2018-06-01&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb28-14" data-line-number="14"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">current_role =</span> <span class="st">&quot;MP&quot;</span>)</a></code></pre></div>
+<p>Now we join the tables. We will add two columns from the existing data. One for <code>ipsa_name</code> and one for data.parliament <code>dp_name</code> to clarify the sources of the names. We will also tidy up the <code>ipsa_match</code> column so that MPs who later became lords are correctly identified as matching.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1">ipsa_commons &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(ipsa_commons_currentmp, ipsa_commons_lords, ipsa_commons_ex) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb29-2" data-line-number="2"><span class="st">  </span><span class="kw">arrange</span>(commons_short) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb29-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">ipsa_name =</span> mps_name) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb29-4" data-line-number="4"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">dp_name =</span> display_as)</a>
+<a class="sourceLine" id="cb29-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb29-6" data-line-number="6"><span class="co"># replace NA for MPs who appear in IPSA but became Lords</span></a>
+<a class="sourceLine" id="cb29-7" data-line-number="7">ipsa_commons<span class="op">$</span>ipsa_match &lt;-<span class="st"> </span>ipsa_commons<span class="op">$</span>ipsa_match <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb29-8" data-line-number="8"><span class="st">  </span><span class="kw">replace_na</span>(<span class="st">&quot;TRUE&quot;</span>)</a></code></pre></div>
+<p>The next task is simply to add relevant data from ipsa_commons to the ipsa table.</p>
+</div>
+<div id="add-the-data-to-ipsa" class="section level3">
+<h3>Add the data to IPSA</h3>
+<p>We now want to add data to the IPSA table, notably the member_id and names. For the financial years May 2010 to end of March 2018 there were 1,446,217 rows. We should expect that to go up by two because we are adding the two new MPs who do not yet appear in ipsa.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1">ipsa &lt;-<span class="st"> </span>ipsa_commons <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb30-2" data-line-number="2"><span class="st">  </span><span class="kw">select</span>(ipsa_name, mps_name, dp_name, member_id, current_role, commons_short) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb30-3" data-line-number="3"><span class="st">  </span><span class="kw">left_join</span>(., ipsa, <span class="dt">by =</span> <span class="st">&quot;mps_name&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb30-4" data-line-number="4"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span><span class="st">`</span><span class="dt">commons_short.y</span><span class="st">`</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb30-5" data-line-number="5"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">commons_short =</span> <span class="st">`</span><span class="dt">commons_short.x</span><span class="st">`</span>)</a>
+<a class="sourceLine" id="cb30-6" data-line-number="6"><span class="kw">nrow</span>(ipsa)</a>
+<a class="sourceLine" id="cb30-7" data-line-number="7"><span class="co">#&gt; [1] 1446219</span></a></code></pre></div>
+<p>We now have a complete IPSA table with 1,446,219 records.</p>
+</div>
+<div id="tidying-up" class="section level3">
+<h3>Tidying Up</h3>
+<p>We had preserved duplicate name entries for Vince and Vincent Cable and Martin Docherty/Docherty Hughes respectively. With the correct matching into IPSA to add the member_id the duplicates can now be removed.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1">ipsa_commons &lt;-<span class="st"> </span>ipsa_commons <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb31-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(duplicate <span class="op">==</span><span class="st"> </span><span class="ot">FALSE</span>)</a></code></pre></div>
+</div>
+<div id="conclusion" class="section level3">
+<h3>Conclusion</h3>
+<p>The main outcome of this process is the <code>ipsa_commons</code> table that provides a concordance between the IPSA and the <code>data.parliament</code> data. In addition, <code>data.parliament</code> data fields have been added to the corresponding IPSA expenses table.</p>
+<p>Issues to remember when using the package tables are:</p>
+<ul>
+<li>New issues of IPSA data may produce new issues (notably name variants) and it takes a while for new MPs to appear in the system. IPSA data is also always a few months out of date.</li>
+<li>Parliamentary data is by its nature dynamic. MPs leave and enter the house between and after general elections, they may change name if the marry or if they move to the house of lords.</li>
+</ul>
+<p>The practical significance of this is that new changes emerge in the data that need to be identified and a significant amount of cross checking is required. Much of this could be addressed if IPSA was to harmonise its approach with <code>data.parliament</code> notably on personal name conventions, member_ids and constituency names etc. The single most important change would be the use of member-ids. However, a way to address the movement of MPs to the Lords would probably need to be addressed.</p>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

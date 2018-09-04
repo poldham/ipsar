@@ -1,0 +1,20 @@
+Package: ipsar
+Title: UK Member of Parliament Expenses
+Version: 0.0.0.9000
+Authors@R: person("Paul", "Oldham", email = "poldham@mac.com", role = c("aut", "cre"))
+Description: Access UK Member of Parliament Expenses from the Independent Parliamentary Standards Authority. Link the data with the UK data.parliament Member Name Information Service. 
+Depends: R (>= 3.4.4)
+License: MIT
+Encoding: UTF-8
+LazyData: true
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat
+VignetteBuilder: knitr
+RoxygenNote: 6.1.0
+Roxygen: list(markdown = TRUE)
+URL: https://github.com/poldham/ipsar
+BugReports: https://github.com/poldham/ipsar/issues
+Imports: 
+    magrittr

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Paul Oldham" />
+
+<meta name="date" content="2018-04-27" />
+
+<title>Name Matching between IPSA and data.parliament</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Name Matching between IPSA and data.parliament</h1>
+<h4 class="author"><em>Paul Oldham</em></h4>
+<h4 class="date"><em>2018-04-27</em></h4>
+
+
+
+<p>This vignette documents the process of matching data from the <code>Independent Parliamentary Standards Authority</code> (IPSA) with the <code>data.parliament Members' Name Data Platform</code>. It consists of the steps involved in processing the data in R to arrive at accurate matches and counts for consistency between the <code>IPSA</code> records and the <code>data.parliament</code> records. This proved to be quite involved and is documented here to assist with understanding how the data package was created.</p>
+<p>The <code>data.parliament</code> service provides access to a wide range of information on the UK Parliament. One of the main services is the <a href="http://data.parliament.uk/membersdataplatform/memberquery.aspx#membershipinfotable">Members Name Data Platform</a>, formerly known as the Members Name Information Service or MNIS. The service can be accessed through the <a href="https://github.com/evanodell/mnis"><code>mnis</code></a> package by Evan Odell. Additional information can be gained as needed from the <a href="https://github.com/evanodell/hansard"><code>hansard</code></a> package.</p>
+<p>The list of all former and current members (MPs and Lords) can be obtained through the <code>mnis</code> package using <code>mnis::mnis_all_members()</code>. This includes the data services IDs for members of parliament that can be used to link to other sources of public <code>data.parliament</code> information on Members.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;mnis&quot;</span>)
+<span class="kw">library</span>(mnis)
+members &lt;-<span class="st"> </span><span class="kw">mnis_all_members</span>() <span class="co"># change to members</span></code></pre></div>
+<p>Unfortunately, the IPSA data is not particularly consistent with the <code>data.parliament</code> name format which lists names as surname, first name with optional honorifics. This requires some cleaning and adjustment to resolve.</p>
+<p>Our aim is to create a data table that matches the names of MPs listed in the IPSA records with the MNIS data. This involves five main issues.</p>
+<ol style="list-style-type: lower-alpha">
+<li>Variations in the names used in IPSA and in <code>data.parliament</code>.</li>
+<li>The departure of MPs from the House of Commons</li>
+<li>The movement of MPs from the House of Commons to the House of Lords. At this point their names change from being <code>first name, second name</code> to <code>Lord or Baron or Baroness surname of place</code> in the <code>data.parliament</code> records.</li>
+<li>MPs who have not submitted an expenses claim to IPSA during their membership. This affects 1 MP to date, Chris Hazzard of Sinn Fein.</li>
+<li>Any MPs who left the house in the period between General Elections (one MP Barry McElduff left the House following the May 2017 General Election)</li>
+</ol>
+<p>We were obliged to feel our way forward with this and to engage in some manual clean up at the final stage. However, the good news is this should not need to be done twice.</p>
+<div id="preparing-the-data.parliament-data" class="section level3">
+<h3>Preparing the data.parliament data</h3>
+<p>We can make progress by recognising that IPSA covers the expenses of Members of Parliament (not the House of Lords). We therefore confine the data_parliamnent data to MPs. We can use the <code>house</code> column in <code>mnis_all_members</code> to filter the data only to members of the Commons.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)
+commons &lt;-<span class="st"> </span>members <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># becomes commons and all_members</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(house <span class="op">==</span><span class="st"> &quot;Commons&quot;</span>)</code></pre></div>
+<p>That reduces the mnis data by just over half. We could further limit the data on the <code>current_status_name</code> to Current members but we will not go there yet. Note that we will pick up former members who are now members of the lords further on in the process.</p>
+<p>We will exclude former MPs who left the house before the IPSA expenses claims system started in May 2010 using the <code>house_end_date</code> field. The challenge here is that those MPs who are current MPs appear as NA in this column.</p>
+<p>We deal with that by creating a temporary end date field and using <code>replace_na()</code> to create a date that is current. We will drop this modified column later and revert to the original using the IDs.</p>
+<p>There are 650 current serving MPs (but one seat, Barry McElduff is presently vacant following his resignation in January 2018) and so we should be expecting to obtain the list of all MPs from 2010 onwards. There were General Elections in the UK on the 6th of May 2010, the 7th of May 2015 and the 8th of June 2017. Our target is 649 after McElduff.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">commons &lt;-<span class="st"> </span>commons <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">house_end_date =</span> lubridate<span class="op">::</span><span class="kw">ymd</span>(.<span class="op">$</span>house_end_date)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">temp_end =</span> house_end_date) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">replace_na</span>(<span class="kw">list</span>(<span class="dt">temp_end =</span> <span class="st">&quot;2018-03-01&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(temp_end <span class="op">&gt;=</span><span class="st"> &quot;2010-01-01&quot;</span> <span class="op">&amp;</span><span class="st"> </span>temp_end <span class="op">&lt;=</span><span class="st"> &quot;2018-03-01&quot;</span>) 
+
+<span class="co"># Test that the current status active and the temp_end date counts match. Target is 649</span>
+
+commons <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(current_status_is_active <span class="op">==</span><span class="st"> &quot;True&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">nrow</span>()
+<span class="co">#&gt; [1] 649</span>
+
+commons <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(temp_end <span class="op">==</span><span class="st"> &quot;2018-03-01&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">nrow</span>()
+<span class="co">#&gt; [1] 649</span></code></pre></div>
+<p><strong><em>Remove honorifics</em></strong></p>
+<p>Our aim is to arrive at temporary name fields in <code>commons</code> that is as close as possible to the names in IPSA. To do that we will create a <code>commons_short</code> name from the <code>display_as</code> field and remove the honorifics.</p>
+<p>We need to be a little careful about the Miss, Ms honorifics and to not replace the Dr in names like Drax. So in all cases we will replace the honorifics using a trailing space.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create commons_short preserving the original commons display_as field</span>
+
+commons<span class="op">$</span>commons_short &lt;-<span class="st"> </span>commons<span class="op">$</span>display_as
+
+<span class="co"># remove honorifics from commons_short</span>
+commons<span class="op">$</span>commons_short &lt;-<span class="st"> </span><span class="kw">str_replace</span>(commons<span class="op">$</span>commons_short, <span class="st">&quot;Miss &quot;</span>, <span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace</span>(., <span class="st">&quot;Mrs &quot;</span>, <span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">str_replace</span>(., <span class="st">&quot;Ms &quot;</span>, <span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace</span>(., <span class="st">&quot;Mr &quot;</span>, <span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace</span>(., <span class="st">&quot;Dr &quot;</span>, <span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace</span>(., <span class="st">&quot;Sir &quot;</span>, <span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">str_replace</span>(., <span class="st">&quot;Dame &quot;</span>, <span class="st">&quot;&quot;</span>)
+
+commons<span class="op">$</span>commons_short &lt;-<span class="st"> </span><span class="kw">trimws</span>(commons<span class="op">$</span>commons_short, <span class="dt">which =</span> <span class="st">&quot;both&quot;</span>)
+
+<span class="co"># Note that the honorific Lady is not included in the list above to avoid reducing Lady Hermon to a non-matching Hermon. Hyphens in names are retained because they are more frequent than versions of names without hyphens. </span></code></pre></div>
+<p>One of the things that became clear during cleaning is that there are:</p>
+<ol style="list-style-type: lower-alpha">
+<li>two Ian Paisleys. The deceased Reverend Ian Paisley who passed away in September 2014 and his son Ian Paisley who was elected to his seat. If maintained as is then the two sets of expenses will overlap.</li>
+</ol>
+<p>To distinguish them use:</p>
+<ul>
+<li>The Reverend Ian Paisley (as is in the commons <code>display_as</code> field)</li>
+<li>Ian Paisley</li>
+</ul>
+<p>In IPSA we need to bear in mind that Ian Paisley junior assumed office from the 7th of May 2010 and the Reverend Ian Paisley did not appear in the first set of expenses claims. This resolves the matching problem. The late The Reverend Ian Paisley can be excluded at a later stage as not appearing in IPSA records.</p>
+<p><strong><em>Duplicate Names and Name Variants</em></strong></p>
+<ul>
+<li>Mike Brown and Mike B Brown</li>
+</ul>
+<p>In <code>commons</code> there are two Mike Brown entries. Mike B Wood is the Conservative MP for Dudley South BC in the IPSA record while Mike Wood is the Labour MP for Batley and Spen BC.</p>
+<p>So, for clarity the MP for Dudley South entry is converted to Mike B Wood in the <code>commons</code> record to match with the IPSA approach.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># arrange by dp_short name for edit</span>
+commons &lt;-<span class="st"> </span>commons <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(commons_short)
+<span class="co"># change the short name to match ipsa</span>
+commons[<span class="dv">796</span>,]<span class="op">$</span>commons_short &lt;-<span class="st"> &quot;Mike B Wood&quot;</span></code></pre></div>
+</div>
+<div id="preparing-ipsa-names" class="section level3">
+<h3>Preparing IPSA names</h3>
+<p>Two other issues required attention in the IPSA record.</p>
+<p>In IPSA Vince Cable is entered both as Vince and Vincent Cable. Examination of the IPSA record reveals that until 2017 the IPSA <code>mps_name</code> is Vincent Cable and then switches to Vince Cable in the 2017 entries. The answer to this seems to be to convert the IPSA record name and note it above.</p>
+<p>First we load the source file and then copy it to a new object ipsa. This helps us avoid overwriting the source data later.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ipsa &lt;-<span class="st"> </span>ipsa_source <span class="co"># see inst/</span>
+<span class="kw">rm</span>(ipsa_source)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ipsa<span class="op">$</span>mps_name &lt;-<span class="st"> </span><span class="kw">str_replace</span>(ipsa<span class="op">$</span>mps_name, <span class="st">&quot;Vincent Cable&quot;</span>, <span class="st">&quot;Vince Cable&quot;</span>)</code></pre></div>
+<p>IPSA records Sylvia Hermon in the MPs name when the mnis <code>display_name</code>, as the preferred name, is Lady Hermon. The IPSA record is edited to match.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ipsa<span class="op">$</span>mps_name &lt;-<span class="st"> </span><span class="kw">str_replace</span>(ipsa<span class="op">$</span>mps_name, <span class="st">&quot;Sylvia Hermon&quot;</span>, <span class="st">&quot;Lady Hermon&quot;</span>)</code></pre></div>
+</div>
+<div id="matching-records-between-datasets" class="section level2">
+<h2>Matching Records Between Datasets</h2>
+<p>We now have a set of names across the period to match into the IPSA data. We need to summarise the IPSA names first.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ipsa_name &lt;-<span class="st"> </span>ipsa <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">count</span>(mps_name, mps_constituency)
+
+<span class="co"># correct esther mcvey duplicate by constituency by combining constituency name.</span>
+ipsa_name &lt;-<span class="st"> </span>ipsa_name <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">arrange</span>(mps_name)
+ipsa_name[<span class="dv">289</span>,]<span class="op">$</span>mps_constituency &lt;-<span class="st"> &quot;Wirral West-Tatton&quot;</span>
+ipsa_name[<span class="dv">290</span>,]<span class="op">$</span>mps_constituency &lt;-<span class="st"> &quot;Wirral West-Tatton&quot;</span>
+<span class="co"># drop second Mcvey</span>
+ipsa_name &lt;-<span class="st"> </span>ipsa_name[<span class="op">-</span><span class="dv">290</span>,]</code></pre></div>
+<p>Now we attempt to match the MPs names from IPSA into the <code>commons</code> set, recalling that we have modified the <code>display_as</code> field in the <code>commons_short</code> column.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ipsa_name<span class="op">$</span>match &lt;-<span class="st"> </span>ipsa_name<span class="op">$</span>mps_name <span class="op">%in%</span><span class="st"> </span>commons<span class="op">$</span>commons_short</code></pre></div>
+<p>So we have 890 matches out of the 949. We will add a mnis_short name to the ipsa data as we know the <code>ipsa</code> <code>mps_name</code> matches <code>commons_short</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">matched &lt;-<span class="st"> </span>ipsa_name <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(match <span class="op">==</span><span class="st"> &quot;TRUE&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">commons_short =</span> mps_name)
+<span class="kw">nrow</span>(matched)
+<span class="co">#&gt; [1] 890</span></code></pre></div>
+<p>Next we identify the missing.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">missed &lt;-<span class="st"> </span>ipsa_name <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(match <span class="op">==</span><span class="st"> &quot;FALSE&quot;</span>)
+<span class="kw">nrow</span>(missed)
+<span class="co">#&gt; [1] 59</span></code></pre></div>
+<p>At this point we have some choices. We could for example use the constituency names to match the names and we could also use the <code>refinr</code> package. However, as this is tricky I decided to go with a manual match using the constituency as the check criteria to create a new data frame with the matched names from the 59 members and former members.</p>
+<p>Note that the addition of Lord, Baroness etc refer to the <code>display_as</code> field in <code>members</code> not the <code>commons_short</code> column. So an additional filter will be needed for the Lords later.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mps_name &lt;-<span class="st"> </span><span class="kw">data_frame</span>(<span class="dt">mps_name =</span> <span class="kw">c</span>(<span class="st">&quot;Lord Beith&quot;</span>,
+<span class="st">&quot;Lord Darling of Roulanish&quot;</span>,
+<span class="st">&quot;Lord Lansley&quot;</span>,
+<span class="st">&quot;Lord Robathan&quot;</span>,
+<span class="st">&quot;Lord Stunell&quot;</span>,
+<span class="st">&quot;Andrew Love&quot;</span>,
+<span class="st">&quot;Angus Brendan MacNeil&quot;</span>,
+<span class="st">&quot;Baroness McIntosh of Pickering&quot;</span>,
+<span class="st">&quot;Anne Marie Morris&quot;</span>,
+<span class="st">&quot;William Cash&quot;</span>,
+<span class="st">&quot;Robert Neill&quot;</span>,
+<span class="st">&quot;Brian H. Donohoe&quot;</span>,
+<span class="st">&quot;Chi Onwurah&quot;</span>,
+<span class="st">&quot;Christian Matheson&quot;</span>,
+<span class="st">&quot;Christopher Pincher&quot;</span>,
+<span class="st">&quot;Chris Elmore&quot;</span>,
+<span class="st">&quot;Chris Leslie&quot;</span>,
+<span class="st">&quot;Dan Byles&quot;</span>,
+<span class="st">&quot;Dan Poulter&quot;</span>,
+<span class="st">&quot;Lord Watts&quot;</span>,
+<span class="st">&quot;Lord Blunkett&quot;</span>,
+<span class="st">&quot;David T. C. Davies&quot;</span>,
+<span class="st">&quot;Lord Willetts&quot;</span>,
+<span class="st">&quot;Baroness Primarolo&quot;</span>,
+<span class="st">&quot;Lord Foster of Bath&quot;</span>,
+<span class="st">&quot;Liz McInnes&quot;</span>,
+<span class="st">&quot;Lord Maude of Horsham&quot;</span>,
+<span class="st">&quot;Lord Young of Cookham&quot;</span>,
+<span class="st">&quot;Ged Killen&quot;</span>,
+<span class="st">&quot;Graham P Jones&quot;</span>,
+<span class="st">&quot;Lord Barker of Battle&quot;</span>,
+<span class="st">&quot;Ian C. Lucas&quot;</span>,
+<span class="st">&quot;Lord Arbuthnot of Edrom&quot;</span>,
+<span class="st">&quot;Jeffrey M. Donaldson&quot;</span>,
+<span class="st">&quot;Joseph Johnson&quot;</span>,
+<span class="st">&quot;Viscount Thurso&quot;</span>,
+<span class="st">&quot;Kenneth Clarke&quot;</span>,
+<span class="st">&quot;Liz Saville Roberts&quot;</span>,
+<span class="st">&quot;Baroness Burt of Solihull&quot;</span>,
+<span class="st">&quot;Baroness Featherstone&quot;</span>,
+<span class="st">&quot;Lord Bruce of Bennachie&quot;</span>,
+<span class="st">&quot;Martin Docherty-Hughes&quot;</span>,
+<span class="st">&quot;Mary Macleod&quot;</span>,
+<span class="st">&quot;Matt Hancock&quot;</span>,
+<span class="st">&quot;Lord Campbell of Pittenweem&quot;</span>,
+<span class="st">&quot;Naz Shah&quot;</span>,
+<span class="st">&quot;Lord Murphy of Torfaen&quot;</span>,
+<span class="st">&quot;Lord Hain&quot;</span>,
+<span class="st">&quot;Philip Boswell&quot;</span>,
+<span class="st">&quot;Siân C. James&quot;</span>,
+<span class="st">&quot;Steve McCabe&quot;</span>,
+<span class="st">&quot;Stewart Malcolm McDonald&quot;</span>,
+<span class="st">&quot;Stuart Blair Donaldson&quot;</span>,
+<span class="st">&quot;Stuart C. McDonald&quot;</span>,
+<span class="st">&quot;Susan Elan Jones&quot;</span>,
+<span class="st">&quot;Baroness Jowell&quot;</span>,
+<span class="st">&quot;Thérèse Coffey&quot;</span>,
+<span class="st">&quot;Lord Hague of Richmond&quot;</span>,
+<span class="st">&quot;William Bain&quot;</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># bind the data frames together</span>
+missed_bind &lt;-<span class="st"> </span><span class="kw">bind_cols</span>(missed, mps_name)
+
+<span class="co"># mps_name1 contains ex MPs who are now Lord, Baroness, Viscount etc. They need to be marked up as they are display_as in mnis_all_members and not mnis_short</span>
+missed_bind<span class="op">$</span>lords &lt;-<span class="st"> </span><span class="kw">str_detect</span>(missed_bind<span class="op">$</span>mps_name1, <span class="st">&quot;^Lord|^Viscount|^Baroness&quot;</span>)</code></pre></div>
+<p>We now need to filter out the Lords from the missed as they will only match on the <code>display_name</code> in our original <code>members</code> table.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">missed_bind_mps &lt;-<span class="st"> </span>missed_bind <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(lords <span class="op">==</span><span class="st"> &quot;FALSE&quot;</span>) <span class="co"># 35</span>
+missed_bind_lords &lt;-<span class="st"> </span>missed_bind <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(lords <span class="op">==</span><span class="st"> &quot;TRUE&quot;</span>) <span class="co"># 24 </span></code></pre></div>
+<p>Next up we rename the <code>mps_name1</code> column to <code>commons_short</code> for mps and <code>display_as</code> for the lords as they will join on different tables.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">missed_bind_mps &lt;-<span class="st"> </span>missed_bind_mps <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">rename</span>(<span class="dt">commons_short =</span> mps_name1)
+missed_bind_mps<span class="op">$</span>lords &lt;-<span class="st"> </span><span class="ot">NULL</span> <span class="co"># drop for bind</span>
+
+missed_bind_lords &lt;-<span class="st"> </span>missed_bind_lords <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">rename</span>(<span class="dt">display_as =</span> mps_name1) <span class="co"># convert to display name in members</span></code></pre></div>
+<p>We can now bind the dfs with <code>commons</code> knowing that we have picked up all the MPs. We will deal with those who have moved to the lords below.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mps_ipsa_commons &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(matched, missed_bind_mps) <span class="co"># 925 + 24 = 949 # change to mps_ipsa_commons</span></code></pre></div>
+<p>In the next step we bind that table to the <code>commons</code> table with 1,126 entries. We will add an <code>ipsa_match</code> column to keep track of the mssing.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># trim white space</span>
+commons<span class="op">$</span>commons_short &lt;-<span class="st"> </span><span class="kw">trimws</span>(commons<span class="op">$</span>commons_short, <span class="dt">which =</span> <span class="st">&quot;both&quot;</span>)
+mps_ipsa_commons<span class="op">$</span>commons_short &lt;-<span class="st"> </span><span class="kw">trimws</span>(mps_ipsa_commons<span class="op">$</span>commons_short, <span class="dt">which =</span> <span class="st">&quot;both&quot;</span>)
+
+<span class="co"># match and cross check row count</span>
+<span class="co"># match commons</span>
+commons<span class="op">$</span>ipsa_match &lt;-<span class="st"> </span>commons<span class="op">$</span>commons_short <span class="op">%in%</span><span class="st"> </span>mps_ipsa_commons<span class="op">$</span>commons_short
+commons <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(ipsa_match <span class="op">==</span><span class="st"> &quot;TRUE&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">nrow</span>()
+<span class="co">#&gt; [1] 925</span>
+
+<span class="co"># match ipsa_commons</span>
+mps_ipsa_commons<span class="op">$</span>commons_short_match &lt;-<span class="st"> </span>mps_ipsa_commons<span class="op">$</span>commons_short <span class="op">%in%</span><span class="st"> </span>commons<span class="op">$</span>commons_short
+mps_ipsa_commons <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(commons_short_match <span class="op">==</span><span class="st"> &quot;TRUE&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">nrow</span>()
+<span class="co">#&gt; [1] 925</span></code></pre></div>
+<p>That gives us 925 matches from IPSA to MNIS plus 24 IPSA to MNIS matches for Lords and a total name list of 1126 from mnis.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">commons<span class="op">$</span>ipsa_match &lt;-<span class="st"> </span>commons<span class="op">$</span>commons_short <span class="op">%in%</span><span class="st"> </span>mps_ipsa_commons<span class="op">$</span>commons_short
+
+commons <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(ipsa_match <span class="op">==</span><span class="st"> </span><span class="ot">FALSE</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">nrow</span>() <span class="co"># count the missing from ipsa</span>
+<span class="co">#&gt; [1] 201</span>
+commons <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(ipsa_match <span class="op">==</span><span class="st"> </span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">nrow</span>() <span class="co"># count matches</span>
+<span class="co">#&gt; [1] 925</span></code></pre></div>
+<p>Of the 201 who are missing 200 are MPs who left the house at the 2010 General Election before the IPSA data starts. One, Chris Hazzard is active but has not made a claim to IPSA. This will be addressed below.</p>
+<p>For matching with the IPSA table. We have 925 identified MPs and 24 who became Lords which brings us to the expected 949 names.</p>
+<p>So, for the ipsa_name table we now:</p>
+<ol style="list-style-type: lower-alpha">
+<li>bind the mps_ipsa_mnis table on the mps_name</li>
+<li>bind the missed_bind_lords on the display_name</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ipsa_name &lt;-<span class="st"> </span>ipsa_name <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">match =</span> ipsa_name<span class="op">$</span>mps_name <span class="op">%in%</span><span class="st"> </span>mps_ipsa_commons<span class="op">$</span>mps_name) <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(match <span class="op">==</span><span class="st"> &quot;TRUE&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># drop unwanted columns prior to joining.</span>
+mps_ipsa_commons &lt;-<span class="st"> </span>mps_ipsa_commons <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(mps_name, mps_constituency, commons_short) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">arrange</span>(commons_short)
+
+<span class="co"># mark matches with ipsa</span>
+commons<span class="op">$</span>ipsa_match &lt;-<span class="st"> </span>commons<span class="op">$</span>commons_short <span class="op">%in%</span><span class="st"> </span>mps_ipsa_commons<span class="op">$</span>commons_short
+
+<span class="co"># filter to those with matches in IPSA</span>
+commons_map &lt;-<span class="st"> </span>commons <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(ipsa_match <span class="op">==</span><span class="st"> </span><span class="ot">TRUE</span>)
+
+<span class="co"># join tables on mnis_short for MPs</span>
+mps &lt;-<span class="st"> </span><span class="kw">left_join</span>(commons_map, mps_ipsa_commons, <span class="dt">by =</span> <span class="st">&quot;commons_short&quot;</span>)</code></pre></div>
+<p>So that is the first part.</p>
+<p>The second part is to join the lords group on <code>display_name</code>. Note that care is needed when deleting duplicate entries for Thurso by position.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">members<span class="op">$</span>exmp &lt;-<span class="st"> </span>members<span class="op">$</span>display_as <span class="op">%in%</span><span class="st"> </span>missed_bind_lords<span class="op">$</span>display_as
+
+<span class="co"># filter to true</span>
+commons_lords_match &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(members, exmp <span class="op">==</span><span class="st"> </span><span class="ot">TRUE</span>)
+
+<span class="co"># drop the two extra thursos. Note repeat twice. Check table when deleting by position. </span>
+
+commons_lords_match &lt;-<span class="st"> </span>commons_lords_match[<span class="op">-</span><span class="dv">22</span>,]
+commons_lords_match &lt;-<span class="st"> </span>commons_lords_match[<span class="op">-</span><span class="dv">22</span>,]
+
+<span class="co"># create lords table</span>
+
+lords &lt;-<span class="st"> </span><span class="kw">left_join</span>(commons_lords_match, missed_bind_lords, <span class="dt">id =</span> <span class="st">&quot;display_name&quot;</span>)
+<span class="co">#&gt; Joining, by = &quot;display_as&quot;</span></code></pre></div>
+<p>Now we join the two tables:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># House end date for lords from members converted to Date format</span>
+lords<span class="op">$</span>house_end_date &lt;-<span class="st"> </span>lubridate<span class="op">::</span><span class="kw">ymd</span>(lords<span class="op">$</span>house_end_date)
+
+<span class="co"># bind and drop unwanted columns</span>
+results &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(mps, lords) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>exmp, <span class="op">-</span>n, <span class="op">-</span>match) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>house_membership)</code></pre></div>
+<p>That gives us 949 results. Note that <code>dp_short</code> is not present for Lords.</p>
+<p>So, that has successfully mapped the 949 MP names in IPSA into mnis.</p>
+<p>Next we simply use the <code>member_id</code> in the result to identify those MPs who are in IPSA and those who are outside. We can then review why they are not present in IPSA (they should all have a house end date before the start of the IPSA records on May the 7th 2010).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">commons &lt;-<span class="st"> </span>commons <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">ipsa_match =</span> commons<span class="op">$</span>member_id <span class="op">%in%</span><span class="st"> </span>results<span class="op">$</span>member_id)</code></pre></div>
+<p>Take a quick look to using the current status field.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">commons <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(ipsa_match <span class="op">==</span><span class="st"> &quot;FALSE&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(current_status_is_active)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">select</span>(display_as, current_status_is_active)
+<span class="co">#&gt; # A tibble: 201 x 2</span>
+<span class="co">#&gt;    display_as        current_status_is_active</span>
+<span class="co">#&gt;    &lt;chr&gt;             &lt;chr&gt;                   </span>
+<span class="co">#&gt;  1 Chris Hazzard     True                    </span>
+<span class="co">#&gt;  2 Mr Adam Ingram    False                   </span>
+<span class="co">#&gt;  3 Adam Price        False                   </span>
+<span class="co">#&gt;  4 Mr Alan Milburn   False                   </span>
+<span class="co">#&gt;  5 Alan Simpson      False                   </span>
+<span class="co">#&gt;  6 Mr Alan Williams  False                   </span>
+<span class="co">#&gt;  7 Alan Wright       False                   </span>
+<span class="co">#&gt;  8 Mr Andrew Dismore False                   </span>
+<span class="co">#&gt;  9 Mr Andrew Mackay  False                   </span>
+<span class="co">#&gt; 10 Andrew Mackinlay  False                   </span>
+<span class="co">#&gt; # ... with 191 more rows</span></code></pre></div>
+<p>This reveals that with one exception, Chris Hazzard from Sinn Fein who has not made a claim, all MPs have a house end date on or before the 2010-05-06, the day before the start of the IPSA records. That is what we would expect.</p>
+<p>We now join Hazzard onto the results table. Bear in mind that he will be <code>ipsa_match</code> = FALSE and the fields will be filled with NAs.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">hazzard &lt;-<span class="st"> </span>commons <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(commons_short <span class="op">==</span><span class="st"> &quot;Chris Hazzard&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>exmp, <span class="op">-</span>house_membership) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">mps_name =</span> display_as) <span class="co"># add mps_name for table join</span>
+
+results &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(results, hazzard) <span class="co"># include hazzard</span></code></pre></div>
+</div>
+<div id="the-ipsa_mnis-table" class="section level2">
+<h2>The ipsa_mnis table</h2>
+<p>The <code>ipsa_commons</code> table contains the match between the member name information service and the ipsa tables</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ipsa_commons &lt;-<span class="st"> </span>results</code></pre></div>
+<p>This is a table for joining.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># convert lords to current role column</span>
+current &lt;-<span class="st"> </span>ipsa_commons <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(current_status_is_active <span class="op">==</span><span class="st"> &quot;True&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">replace_na</span>(<span class="kw">list</span>(<span class="dt">lords =</span> <span class="st">&quot;MP&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">rename</span>(<span class="dt">current_role =</span> lords) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">current_role =</span> <span class="kw">str_replace</span>(.<span class="op">$</span>current_role, <span class="st">&quot;TRUE&quot;</span>, <span class="st">&quot;Lords&quot;</span>))
+
+<span class="co"># identify ex members</span>
+ex &lt;-<span class="st"> </span>ipsa_commons <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(current_status_is_active <span class="op">==</span><span class="st"> &quot;False&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">replace_na</span>(<span class="kw">list</span>(<span class="dt">lords =</span> <span class="st">&quot;Ex&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">rename</span>(<span class="dt">current_role =</span> lords)
+
+<span class="co"># bind the tables into ipsa_mnis</span>
+ipsa_commons &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(current, ex)
+
+<span class="co"># select fields to join to ipsa</span>
+id &lt;-<span class="st"> </span>ipsa_commons <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">select</span>(mps_name, member_id, display_as, current_role, current_status_is_active, current_status_name, house_end_date)
+
+<span class="co"># join the processed mnis data onto ipsa</span>
+ipsa &lt;-<span class="st"> </span><span class="kw">inner_join</span>(ipsa, id, <span class="dt">by =</span> <span class="st">&quot;mps_name&quot;</span>)</code></pre></div>
+<p>The target number of rows for the IPSA table is 1,387,126 and this result matches. If Hazzard is added for completenes of member ID matches then 1,387,127 (not implemented).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">save</span>(ipsa, <span class="dt">file =</span> <span class="st">&quot;ipsa.rda&quot;</span>)</code></pre></div>
+<div id="conclusion" class="section level3">
+<h3>Conclusion</h3>
+<p>The main outcome of this process is the <code>ipsa_mnis</code> table that provides a concordance between the IPSA and the MNIS data. In addition, MNIS data fields have been added to the corresponding IPSA expenses table.</p>
+<p>Issues to remember when using the package tables are:</p>
+<ul>
+<li>One MP, Chriz Hazzard is present in the ipsa_mnis concordance but does not appear in the IPSA data because no expenses claims have been submitted.</li>
+<li>Two MPs names were adjusted in the IPSA record</li>
+<li>Esther Mcvey appears twice in the IPSA data for different constituencies and her constituency has been edited to the combined “Wirral West-Tatton”</li>
+<li>Lady Hermon (Sylvia Hermon’s) name was edited in IPSA to the preferred Lady Hermon from MNIS</li>
+<li>Barry McElduff left the house in early 2018 and his former seat is vacant</li>
+</ul>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

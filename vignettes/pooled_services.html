@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Paul Oldham" />
+
+<meta name="date" content="2018-09-04" />
+
+<title>Exploring Pooled Services</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Exploring Pooled Services</h1>
+<h4 class="author"><em>Paul Oldham</em></h4>
+<h4 class="date"><em>2018-09-04</em></h4>
+
+
+
+<p>MPs can pool expenses to pay for shared resources under a system called <code>pooled services</code>. Pooled services are typically for research services such as the payment of researchers salaries and associated costs. At the time of writing there were five such services.</p>
+<ul>
+<li>The Parliamentary Support Team (PST) provides pooled services to Liberal Democrat MPs</li>
+<li>The Parliamentary Research Service (PRS) provides pooled services to Labour Party MPs</li>
+<li>The Policy Research Unit (PRU) provides pooled services to Conservative Party MPs.</li>
+<li>The European Research Group (ERG) provides research and briefing materials to Conservative MPs on issues relating to the UK’s relationship with the European Union.</li>
+<li>The Scottish National Party (SNP) Research Team provides pooled services to SNP MPs.</li>
+</ul>
+<p>IPSA has produced an an assessment of pooled services <a href="https://www.theipsa.org.uk/media/184678/pooled-services-assurance-report_final.pdf">Assurance Review: Pooled Services, Assessment of risks, controls and compliance, 2015-2016</a> that was last updated in 2017.</p>
+<p>MPs pay for these services through subscription fees that are then reclaimed as expenses. At present the package does not compile this data. Initial exploration of the data reveals that the descriptions of these services varies and affects our ability to accurately capture expenses claims. We can however get an initial idea of what might be involved by simply searching for research in the data and seeking to capture variants:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(tidyverse)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">ipsa<span class="op">$</span>research &lt;-<span class="st"> </span><span class="kw">str_detect</span>(ipsa<span class="op">$</span>short_description, <span class="st">&quot; Research*&quot;</span>)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">research &lt;-<span class="st"> </span>ipsa <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(research <span class="op">==</span><span class="st"> &quot;TRUE&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="st">  </span><span class="kw">select</span>(expense_type, short_description, details)</a>
+<a class="sourceLine" id="cb1-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="kw">head</span>(research)</a>
+<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="co">#&gt; # A tibble: 6 x 3</span></a>
+<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="co">#&gt;   expense_type             short_description              details         </span></a>
+<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co">#&gt;   &lt;chr&gt;                    &lt;chr&gt;                          &lt;chr&gt;           </span></a>
+<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="co">#&gt; 1 Professional Services    Parliamentary Research Service Subscription to…</span></a>
+<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="co">#&gt; 2 Professional Services    Parliamentary Research Unit    Quarter 2 payme…</span></a>
+<a class="sourceLine" id="cb1-13" data-line-number="13"><span class="co">#&gt; 3 Professional Services    Parliamentary Research Service Parliamentary R…</span></a>
+<a class="sourceLine" id="cb1-14" data-line-number="14"><span class="co">#&gt; 4 Pooled Staffing Services European Research Group        Part pay of mem…</span></a>
+<a class="sourceLine" id="cb1-15" data-line-number="15"><span class="co">#&gt; 5 Pooled Staffing Services European Research Group        European Resear…</span></a>
+<a class="sourceLine" id="cb1-16" data-line-number="16"><span class="co">#&gt; 6 Professional Services    Pooled Research Services Inv.  Purchase of Par…</span></a></code></pre></div>
+<p>As this makes clear, this data is rather messy and would require care in cleaning up. As we will see in the example below, the details of expenses may be spread across multiple columns.</p>
+<p>The European Research Group (ERG) is a topical example of one such pooled service that illustrates the work involved in arriving at a clean and tidy dataset.</p>
+<p>MPs subscriptions to the ERG are recorded in the <code>short_description</code> column and in the <code>details</code> column. This is likely to be the case for other pooled services.</p>
+<p>Rather than focus on the most efficient route to name cleaning (e.g. using regular expressions) a simpler approach involving identification and standardization of variants is used with the <code>stringr</code> package which forms part of the <code>tidyverse</code>. The benefit of this approach is that it is more transparent and easier to track variants and make corrections over time. We put the cleaned up data in a new column called <code>clean_description</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(tidyverse)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">ipsa<span class="op">$</span>clean_description &lt;-<span class="st"> </span>ipsa<span class="op">$</span>short_description <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;European Research Group&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;EUROPEAN RESEARCH GROUP&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;European Research Group staff&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;110516 - ERG Membership&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG Fees&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG Payment&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG Researcher&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG Sub 2011-12&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-11" data-line-number="11"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG subscription&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb2-12" data-line-number="12"><span class="st">  </span><span class="kw">str_replace</span>(<span class="st">&quot;ERG 2010/2011&quot;</span>, <span class="st">&quot;ERG&quot;</span>)</a></code></pre></div>
+<p>In some cases the reference to the pooled service is not contained in the <code>short_description</code> field but in the <code>details</code> field. We therefore need to run the same exercise with the details field based on manual inspection of summaries of this field. To manually inspect the data we can use the following and hunt through for entries relevant to the pooled service we are looking for. There is a lot to review and hence we use <code>View()</code></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">ipsa <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">count</span>(details) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">View</span>()</a></code></pre></div>
+<p>It turns out that references to the subscriptions in the details field contain characters such as <code>[***]</code> and <code>()</code> that cause problems if we try to replace them in a straighforward way. We therefore use a couple of regular expressions at the beginning of the tidy up and edit the named entries to exclude those for matching. This will only be as good as our ability to spot the variants in the data.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">ipsa<span class="op">$</span>clean_details &lt;-<span class="st"> </span>ipsa<span class="op">$</span>details <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">[([^]]*)]&quot;</span>, <span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># remove hard brackets and ***</span></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;[(]|[)]&quot;</span>, <span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># remove brackets</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;European Research Group&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;EUROPEAN RESEARCH GROUP&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;2010 EUROPEAN RESERCH GROUP&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;Annual subs European Research Group&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;European Research Group for 2010/11&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;European Research Group Membership&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;European Research Group pooled staff&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;European Research Group Researcher&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;European Research Group Subscription&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-13" data-line-number="13"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;Membership for the European Research Group&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-14" data-line-number="14"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;Research Services - European Research Group &quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-15" data-line-number="15"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;Membership for European Research Group for Committee Purposes&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;Research Services - European Research Group &quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;Research services on European issues, in support of Parliamentary functions&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG Pooled staffing&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-19" data-line-number="19"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG services from pooled staff member as previous year&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-20" data-line-number="20"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG subscription&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-21" data-line-number="21"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG Subscription&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-22" data-line-number="22"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG subscription &quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-23" data-line-number="23"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG subscription-&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-24" data-line-number="24"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG subscriptionIP&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-25" data-line-number="25"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG for 2010/11&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-26" data-line-number="26"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG Researcher&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-27" data-line-number="27"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;Membership for ERG for Committee purposes&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb4-28" data-line-number="28"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG Membership&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-29" data-line-number="29"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERGservices from pooled staff member as previous year&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-30" data-line-number="30"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;Annual subs ERG&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-31" data-line-number="31"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;Annual Sub 2013-14&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-32" data-line-number="32"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG Membership&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-33" data-line-number="33"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;PART STAFFING COSTS FOR ERGBACS payment received&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-34" data-line-number="34"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;PART STAFFING COSTS FOR ERG &quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-35" data-line-number="35"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERGIP&quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-36" data-line-number="36"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG &quot;</span>, <span class="st">&quot;ERG&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-37" data-line-number="37"><span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;ERG-&quot;</span>, <span class="st">&quot;ERG&quot;</span>) </a></code></pre></div>
+<p>We can now take a look at summarising the subscribers. We add an id by row to assist with identifying duplicates and break the data into two tables that we join back together again to identify and filter out duplicates on the row id. Basically, no row id should appear twice or we will over count.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co"># Add a count of the number of subscriptions over the years</span></a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">ipsa<span class="op">$</span>id &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(ipsa)</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3">erg1 &lt;-<span class="st"> </span>ipsa <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(clean_description <span class="op">==</span><span class="st"> &quot;ERG&quot;</span>)</a>
+<a class="sourceLine" id="cb5-4" data-line-number="4">erg2 &lt;-<span class="st"> </span>ipsa <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(clean_details  <span class="op">==</span><span class="st"> &quot;ERG&quot;</span>)</a>
+<a class="sourceLine" id="cb5-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co"># bind, identify duplicates and filter to non-duplicated entries. </span></a>
+<a class="sourceLine" id="cb5-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb5-8" data-line-number="8">erg &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(erg1, erg2) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb5-9" data-line-number="9"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">duplicated =</span> <span class="kw">duplicated</span>(.<span class="op">$</span>id)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb5-10" data-line-number="10"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(duplicated <span class="op">==</span><span class="st"> &quot;FALSE&quot;</span>)</a>
+<a class="sourceLine" id="cb5-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="kw">rm</span>(erg1, erg2)</a></code></pre></div>
+<p>The annual subscription rate for the ERG is presently £2000. We need to check for entries in a given financial year that exceed that for review.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="co"># test count of subscription levels by year</span></a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">erg_count &lt;-<span class="st"> </span>erg <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="st">  </span><span class="kw">group_by</span>(year, member_id, mps_name, dp_name, current_role) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="st">  </span><span class="kw">tally</span>(amount_claimed, <span class="dt">sort =</span> <span class="st">&quot;TRUE&quot;</span>)</a>
+<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="kw">head</span>(erg_count)</a>
+<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co">#&gt; # A tibble: 6 x 6</span></a>
+<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#&gt; # Groups:   year, member_id, mps_name, dp_name [6]</span></a>
+<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="co">#&gt;   year  member_id mps_name          dp_name             current_role     n</span></a>
+<a class="sourceLine" id="cb6-9" data-line-number="9"><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;             &lt;chr&gt;               &lt;chr&gt;        &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb6-10" data-line-number="10"><span class="co">#&gt; 1 13_14 373       David Davis       Mr David Davis      MP            4000</span></a>
+<a class="sourceLine" id="cb6-11" data-line-number="11"><span class="co">#&gt; 2 14_15 1462      Angela Watkinson  Dame Angela Watkin… Ex            4000</span></a>
+<a class="sourceLine" id="cb6-12" data-line-number="12"><span class="co">#&gt; 3 17_18 4639      Bim Afolami       Bim Afolami         MP            4000</span></a>
+<a class="sourceLine" id="cb6-13" data-line-number="13"><span class="co">#&gt; 4 12_13 4140      David Nuttall     Mr David Nuttall    Ex            3950</span></a>
+<a class="sourceLine" id="cb6-14" data-line-number="14"><span class="co">#&gt; 5 13_14 1405      Mark Field        Mark Field          MP            2000</span></a>
+<a class="sourceLine" id="cb6-15" data-line-number="15"><span class="co">#&gt; 6 13_14 1425      Jonathan Djanogly Mr Jonathan Djanog… MP            2000</span></a></code></pre></div>
+<p>There are four entries that are over 2000 in a given year that need investigation and may require adjustment if they involve a repayment. The details of the four entries are:</p>
+<ol style="list-style-type: decimal">
+<li>14_15 1462 Angela Watkinson 4000</li>
+</ol>
+<p>This involves three entries on the same day with one listed as a repayment. This suggests an accidental double claim and correction through repayment. This can be reduced to a single payment.</p>
+<ol start="2" style="list-style-type: decimal">
+<li><p>17_18 4639 Bim Afolami 4000. Appears as two payments on the same day in the 2017-2018 expenses. A check in the original csv reveals the double entry. This can reasonably be reduced to a single payment.</p></li>
+<li><p>13_14 373 David Davis 4000. Two entries. One at the start of the financial year and one at the end on the 2014-03-20 with no entry for 14_15 signifying advanced payment for that 14-15 shortly before the end of the previous financial year.</p></li>
+<li><p>12_13 4140 David Nuttall 3950. First payment on 12_13 2012-04-11 then on 2013-03-25. No entry for 14_15 signifying an advanced payment in the previous financial year.</p></li>
+</ol>
+<p>To correct for the Angela Watkinson double entry the entries for 2014-2015 will be reduced to one by removing claim_no 365591 using <code>!=</code> for not. We can do the same for the Bim Afolami double entry using the id column to arrive at the final set.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">erg &lt;-<span class="st"> </span>erg <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(claim_no <span class="op">!=</span><span class="st"> &quot;365591&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(id <span class="op">!=</span><span class="st"> &quot;1323443&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">subscription_count =</span> <span class="kw">rep_len</span>(<span class="dv">1</span>, <span class="dt">length.out =</span> <span class="kw">nrow</span>(.)))</a></code></pre></div>
+<p>We are now in a position to count the number of subscriptions over time and to sum the value of subscriptions.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">erg_subscriptions &lt;-<span class="st"> </span>erg <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="st">  </span><span class="kw">group_by</span>(member_id, ipsa_name, dp_name, current_role, mps_constituency) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="st">  </span><span class="kw">summarise_at</span>(<span class="kw">c</span>(<span class="st">&quot;subscription_count&quot;</span>, <span class="st">&quot;amount_claimed&quot;</span>), sum) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(subscription_count))</a>
+<a class="sourceLine" id="cb8-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb8-6" data-line-number="6">erg_subscriptions <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-7" data-line-number="7"><span class="st">  </span><span class="kw">select</span>(member_id, ipsa_name, dp_name, current_role, subscription_count, amount_claimed)</a>
+<a class="sourceLine" id="cb8-8" data-line-number="8"><span class="co">#&gt; # A tibble: 53 x 6</span></a>
+<a class="sourceLine" id="cb8-9" data-line-number="9"><span class="co">#&gt; # Groups:   member_id, ipsa_name, dp_name, current_role [53]</span></a>
+<a class="sourceLine" id="cb8-10" data-line-number="10"><span class="co">#&gt;    member_id ipsa_name       dp_name        current_role subscription_cou…</span></a>
+<a class="sourceLine" id="cb8-11" data-line-number="11"><span class="co">#&gt;    &lt;chr&gt;     &lt;chr&gt;           &lt;chr&gt;          &lt;chr&gt;                    &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb8-12" data-line-number="12"><span class="co">#&gt;  1 1444      Mark Francois   Mr Mark Franc… MP                           8</span></a>
+<a class="sourceLine" id="cb8-13" data-line-number="13"><span class="co">#&gt;  2 4133      Andrew Bridgen  Andrew Bridgen MP                           8</span></a>
+<a class="sourceLine" id="cb8-14" data-line-number="14"><span class="co">#&gt;  3 47        Gerald Howarth  Sir Gerald Ho… Ex                           8</span></a>
+<a class="sourceLine" id="cb8-15" data-line-number="15"><span class="co">#&gt;  4 3977      Chris Heaton-H… Chris Heaton-… MP                           7</span></a>
+<a class="sourceLine" id="cb8-16" data-line-number="16"><span class="co">#&gt;  5 40        Bernard Jenkin  Sir Bernard J… MP                           7</span></a>
+<a class="sourceLine" id="cb8-17" data-line-number="17"><span class="co">#&gt;  6 4140      David Nuttall   Mr David Nutt… Ex                           7</span></a>
+<a class="sourceLine" id="cb8-18" data-line-number="18"><span class="co">#&gt;  7 4064      Steve Baker     Mr Steve Baker MP                           6</span></a>
+<a class="sourceLine" id="cb8-19" data-line-number="19"><span class="co">#&gt;  8 4075      Chris Pincher   Christopher P… MP                           6</span></a>
+<a class="sourceLine" id="cb8-20" data-line-number="20"><span class="co">#&gt;  9 4099      Jacob Rees-Mogg Mr Jacob Rees… MP                           6</span></a>
+<a class="sourceLine" id="cb8-21" data-line-number="21"><span class="co">#&gt; 10 1551      Stewart Jackson Mr Stewart Ja… Ex                           5</span></a>
+<a class="sourceLine" id="cb8-22" data-line-number="22"><span class="co">#&gt; # ... with 43 more rows, and 1 more variable: amount_claimed &lt;dbl&gt;</span></a></code></pre></div>
+<p>If we wanted to add some additional data to this set from the concordance with <code>data.parliament</code> we would do something like the following.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">erg_subscriptions &lt;-<span class="st"> </span>ipsa_commons <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="st">  </span><span class="kw">select</span>(member_id, member_from, gender, date_of_birth, laying_minister_name, house_start_date) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="st">  </span><span class="kw">right_join</span>(., erg_subscriptions, <span class="dt">by =</span> <span class="st">&quot;member_id&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="st">  </span><span class="kw">select</span>(member_id, dp_name, member_from, gender, date_of_birth, laying_minister_name, house_start_date, current_role, amount_claimed, subscription_count)</a>
+<a class="sourceLine" id="cb9-5" data-line-number="5"><span class="kw">head</span>(erg_subscriptions)</a>
+<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="co">#&gt; # A tibble: 6 x 10</span></a>
+<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="co">#&gt;   member_id dp_name         member_from         gender date_of_birth      </span></a>
+<a class="sourceLine" id="cb9-8" data-line-number="8"><span class="co">#&gt;   &lt;chr&gt;     &lt;chr&gt;           &lt;chr&gt;               &lt;chr&gt;  &lt;dttm&gt;             </span></a>
+<a class="sourceLine" id="cb9-9" data-line-number="9"><span class="co">#&gt; 1 1444      Mr Mark Franco… Rayleigh and Wickf… M      1965-08-14 00:00:00</span></a>
+<a class="sourceLine" id="cb9-10" data-line-number="10"><span class="co">#&gt; 2 4133      Andrew Bridgen  North West Leicest… M      1964-10-28 00:00:00</span></a>
+<a class="sourceLine" id="cb9-11" data-line-number="11"><span class="co">#&gt; 3 47        Sir Gerald How… Aldershot           M      1947-09-12 00:00:00</span></a>
+<a class="sourceLine" id="cb9-12" data-line-number="12"><span class="co">#&gt; 4 3977      Chris Heaton-H… Daventry            M      1967-11-28 00:00:00</span></a>
+<a class="sourceLine" id="cb9-13" data-line-number="13"><span class="co">#&gt; 5 40        Sir Bernard Je… Harwich and North … M      1959-04-09 00:00:00</span></a>
+<a class="sourceLine" id="cb9-14" data-line-number="14"><span class="co">#&gt; 6 4140      Mr David Nutta… Bury North          M      1962-03-25 00:00:00</span></a>
+<a class="sourceLine" id="cb9-15" data-line-number="15"><span class="co">#&gt; # ... with 5 more variables: laying_minister_name &lt;chr&gt;,</span></a>
+<a class="sourceLine" id="cb9-16" data-line-number="16"><span class="co">#&gt; #   house_start_date &lt;dttm&gt;, current_role &lt;chr&gt;, amount_claimed &lt;dbl&gt;,</span></a>
+<a class="sourceLine" id="cb9-17" data-line-number="17"><span class="co">#&gt; #   subscription_count &lt;dbl&gt;</span></a></code></pre></div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
