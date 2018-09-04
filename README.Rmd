@@ -93,7 +93,7 @@ This table covers 950 existing and former Members of Parliament. It is important
 
 - `display_as` is the preferred `data.parliament` system name and is duplicated as `dp_name`
 - `mps_name` is the name used by IPSA for recording MPs expenses and is duplicated as `ipsa_name`
-- `commons_short` is the name used for matching between the two sources as described in the [vignette]()
+- `commons_short` is the name used for matching between the two sources as described in the [vignette](https://poldham.github.io/ipsar/articles/ipsa_dataparliament.html)
 
 The key field for the `data.parliament` service is the `member_id`. 
 
@@ -120,7 +120,7 @@ ipsa %>%
 
 ## Data Cleaning and Name Matching with Data.Parliament
 
-Data cleaning and name matching is described in detail in the [vignette](). Here is a quick summary.
+Data cleaning and name matching is described in detail in the [vignette](https://poldham.github.io/ipsar/articles/ipsa_dataparliament.html). Here is a quick summary.
 
 The IPSA data frame has undergone minimal cleaning:
 
